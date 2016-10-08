@@ -1,0 +1,102 @@
+* {
+  -webkit-border-radius: 0 !important;
+     -moz-border-radius: 0 !important;
+          border-radius: 0 !important;
+}
+
+html,body {
+    color : #333;
+    background: #FFF;
+    font-family: "Andale Mono", sans-serif;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.main-wrapper {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.nav-wrapper {
+    background: #2c3e50;
+    color: #FFF;
+    width: 220px;
+    float: left;
+    height: 100%;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav-wrapper > .nav-brand {
+    color: #FFF;
+    height: 65px;
+    font-size: 30px;
+    line-height: 70px;
+}
+
+.nav-wrapper  > .nav-brand a {
+    color: #a9a9a9;
+}
+
+.nav-wrapper  > .nav-brand a:hover {
+    color: #fff;
+    background: none;
+    text-decoration: none;
+}
+
+.nav-wrapper > .nav-brand > span {
+    font-size: 35px;
+    -webkit-text-fill-color: black; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 1px;
+}
+
+.nav-wrapper li {
+    text-indent: 10px;
+    line-height: 40px;
+}
+
+.nav-menu {
+    background: #2c3e50;
+    color: #FFF;
+    float: left;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-menu li a {
+    display: block;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.nav-menu li a:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.nav-menu  li a:active,
+.nav-menu  li a:focus {
+    text-decoration: none;
+}
+
+.content {
+    padding-left: 20px;
+    padding-top: 10px;
+}
+
+.content-wrapper {
+    width: calc(100% - 220px);
+    height: 100%;
+    padding: 0px;
+    background:#FFF;
+    float: right;
+}
