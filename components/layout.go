@@ -10,6 +10,7 @@ import (
 type Layout struct {
 	*gr.This
 	Title   string
+	Uri     string
 	Content *gr.ReactComponent
 }
 
@@ -20,10 +21,10 @@ func (l Layout) Render() gr.Component {
 		gr.CSS("main-wrapper"),
 
 		// Nav
-		gr.New(&Nav{Brand: "awsm"}).CreateElement(l.Props()),
+		gr.New(&Nav{Brand: "awsm"}).CreateElement(l.This.Props()),
 
 		//Content
-		gr.New(&Content{}).CreateElement(gr.Props{"Title": l.Title}),
+		gr.New(&Content{}).CreateElement(gr.Props{"Title": l.Title, "Uri": l.Uri}),
 	)
 }
 
