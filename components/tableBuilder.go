@@ -2,7 +2,6 @@ package components
 
 import (
 	"encoding/json"
-	"reflect"
 
 	"github.com/Jeffail/gabs"
 	"github.com/bep/gr"
@@ -29,7 +28,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "instances":
@@ -37,7 +36,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "volumes":
@@ -45,7 +44,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "images":
@@ -54,7 +53,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "keypairs":
@@ -62,7 +61,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "snapshots":
@@ -71,7 +70,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "vpcs":
@@ -80,7 +79,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "subnets":
@@ -89,7 +88,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "securitygroups":
@@ -98,7 +97,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "addresses":
@@ -107,7 +106,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "launchconfigurations":
@@ -116,7 +115,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "loadbalancers":
@@ -125,7 +124,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "scalingpolicies":
@@ -134,7 +133,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	case "simpledbdomains":
@@ -143,7 +142,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		for i, a := range assets {
 			aJson := a.Bytes()
 			json.Unmarshal(aJson, &aType)
-			AwsmTable(i, aType, &header, &rows)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
 	default:
@@ -161,36 +160,6 @@ func TableBuilder(al interface{}) *gr.Element {
 	tBody.Modify(table)
 
 	return table
-}
-
-func AwsmTable(index int, in interface{}, header *[]string, rows *[][]string) {
-
-	t := reflect.TypeOf(in)
-	tV := reflect.ValueOf(in)
-
-	value := reflect.New(t).Interface()
-
-	v := reflect.ValueOf(value)
-	i := reflect.Indirect(v)
-	s := i.Type()
-	fields := s.NumField()
-
-	for k := 0; k < fields; k++ {
-		sTag := t.Field(k).Tag.Get("awsmTable")
-		sVal := tV.Field(k).String()
-
-		if sTag != "" {
-			// Head
-			if index == 0 {
-				*header = append(*header, sTag)
-			}
-			// Rows
-			(*rows)[index] = append(
-				(*rows)[index],
-				sVal,
-			)
-		}
-	}
 }
 
 func buildTableRows(rows [][]string, tBody *gr.Element) {
