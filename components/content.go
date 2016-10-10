@@ -24,6 +24,8 @@ func (c Content) Render() gr.Component {
 	if assets := c.State().Interface("assetList"); assets != nil {
 		table := TableBuilder(assets)
 		table.Modify(response)
+	} else {
+		gr.Text("loading...").Modify(response)
 	}
 
 	return elem
