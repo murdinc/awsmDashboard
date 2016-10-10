@@ -26,7 +26,8 @@ html,body {
     width: 220px;
     float: left;
     height: 100%;
-    position: absolute;
+    position: fixed;
+    overflow-y: scroll;
     margin: 0;
     padding: 0;
     list-style: none;

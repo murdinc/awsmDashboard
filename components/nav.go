@@ -8,11 +8,29 @@ import (
 
 type Nav struct {
 	*gr.This
+	Pages
 	Brand string
+}
+
+type Pages map[string]Page
+
+type Page struct {
+	Title       string
+	ApiEndpoint string
+	Route       string
+	Component   *gr.Component
 }
 
 // Implements the Renderer interface.
 func (c Nav) Render() gr.Component {
+
+	links := []gr.Modifier{gr.CSS("nav-menu", "nav-pills", "nav-stacked")}
+
+	for name, page := range c.Pages {
+		if page.Route != "/" {
+			links = append(links, c.createLinkListItem(page.Route, name))
+		}
+	}
 
 	elem := el.Div(gr.CSS("nav-wrapper"),
 		el.ListItem(
@@ -21,23 +39,7 @@ func (c Nav) Render() gr.Component {
 			gr.Text(" "),
 			grouter.Link("/", c.Brand),
 		),
-		el.UnorderedList(
-			gr.CSS("nav-menu", "nav-pills", "nav-stacked"),
-			c.createLinkListItem("/instances", "Instances"),
-			c.createLinkListItem("/volumes", "Volumes"),
-			c.createLinkListItem("/images", "Images"),
-			c.createLinkListItem("/snapshots", "Snapshots"),
-			c.createLinkListItem("/vpcs", "Vpcs"),
-			c.createLinkListItem("/subnets", "Subnets"),
-			c.createLinkListItem("/securitygroups", "Security Groups"),
-			c.createLinkListItem("/addresses", "Addresses"),
-			c.createLinkListItem("/alarms", "Alarms"),
-			c.createLinkListItem("/keypairs", "Keypairs"),
-			c.createLinkListItem("/launchconfigurations", "Launch Configurations"),
-			c.createLinkListItem("/loadbalancers", "Load Balancers"),
-			c.createLinkListItem("/scalingpolicies", "Scaling Policies"),
-			c.createLinkListItem("/simpledbdomains", "SimpleDB Domains"),
-		),
+		el.UnorderedList(links...),
 	)
 
 	return elem

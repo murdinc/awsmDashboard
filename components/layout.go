@@ -9,22 +9,23 @@ import (
 
 type Layout struct {
 	*gr.This
-	Title   string
-	Uri     string
-	Content *gr.ReactComponent
+	Pages
+	Brand       string
+	ActivePage  string
+	ApiEndpoint string
+	Content     *gr.ReactComponent
 }
 
 // Implements the Renderer interface.
 func (l Layout) Render() gr.Component {
-
 	return el.Div(
 		gr.CSS("main-wrapper"),
 
 		// Nav
-		gr.New(&Nav{Brand: "awsm"}).CreateElement(l.This.Props()),
+		gr.New(&Nav{Brand: l.Brand, Pages: l.Pages}).CreateElement(l.This.Props()),
 
 		//Content
-		gr.New(&Content{}).CreateElement(gr.Props{"Title": l.Title, "Uri": l.Uri}),
+		gr.New(&Content{}).CreateElement(gr.Props{"Title": l.ActivePage, "ApiEndpoint": l.Pages[l.ActivePage].ApiEndpoint}),
 	)
 }
 

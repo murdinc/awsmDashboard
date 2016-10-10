@@ -33,7 +33,7 @@ func (c Content) Render() gr.Component {
 
 // Implements the ComponentDidMount interface
 func (c Content) ComponentDidMount() {
-	resp, err := QueryAPI("//localhost:8081/api" + c.Props().String("Uri"))
+	resp, err := QueryAPI("//localhost:8081/api" + c.Props().String("ApiEndpoint"))
 	if err != nil {
 		panic(err)
 		// TODO handle query failures
