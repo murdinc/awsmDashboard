@@ -34,6 +34,7 @@ func (c Content) ComponentDidMount() {
 	resp, err := QueryAPI("//localhost:8081/api" + c.Props().String("Uri"))
 	if err != nil {
 		panic(err)
+		// TODO handle query failures
 	}
 
 	c.SetState(gr.State{"assetList": resp})
@@ -41,7 +42,7 @@ func (c Content) ComponentDidMount() {
 
 // Implements the ComponentWillUnmount interface
 func (g Content) ComponentWillUnmount() {
-	// TODO: HTTP Cancelation
+	// TODO Handle query cancel
 }
 
 // Implements the ShouldComponentUpdate interface.
