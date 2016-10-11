@@ -14,7 +14,7 @@ var (
 	pages = components.Pages{
 		"Dashboard": components.Page{
 			Route:       "/",
-			ApiEndpoint: "/assets/instances",
+			ApiEndpoint: "/assets/",
 		},
 		"Instances": components.Page{
 			Route:       "/instances",

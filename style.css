@@ -17,20 +17,22 @@ html,body {
 .main-wrapper {
     height: 100%;
     width: 100%;
-    overflow: hidden;
 }
 
 .nav-wrapper {
-    background: #2c3e50;
+    background-color: #2c3e50;
     color: #FFF;
     width: 220px;
     float: left;
     height: 100%;
     position: fixed;
-    overflow-y: scroll;
     margin: 0;
     padding: 0;
     list-style: none;
+    overflow: auto;
+    font-size: 12px;
+    font-weight: 200;
+    top: 0px;
 }
 
 .nav-wrapper > .nav-brand {
@@ -38,6 +40,7 @@ html,body {
     height: 65px;
     font-size: 30px;
     line-height: 70px;
+    display: block;
 }
 
 .nav-wrapper  > .nav-brand a {
@@ -92,6 +95,7 @@ html,body {
 .content {
     padding-left: 20px;
     padding-top: 10px;
+    position: absolute;
 }
 
 .content-wrapper {
@@ -100,4 +104,32 @@ html,body {
     padding: 0px;
     background:#FFF;
     float: right;
+    overflow: visible;
+}
+
+.content {
+    width: calc(100% - 220px);
+    padding-right: 20px;
+    padding-bottom: 100px;
+
+}
+
+.content-header {
+    padding: 10px;
+    padding-top: 20px;
+
+}
+
+.content-header h1 {
+    display: inline;
+}
+
+.content-header div {
+    vertical-align: initial;
+}
+
+.btn-primary {
+    color: #ffffff;
+    background-color: #5f80a0;
+    border-color: #5f80a0;
 }

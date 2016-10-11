@@ -15,8 +15,15 @@ func (c Content) Render() gr.Component {
 	response := el.Div()
 
 	elem := el.Div(gr.CSS("content-wrapper"),
+		el.Div(gr.CSS("content-header"),
+			el.Header1(
+				gr.Text(c.Props().String("Title")+" "),
+				//el.Button(gr.CSS("btn", "btn-primary", "btn-xs"), el.Italic(gr.CSS("fa", "fa-gear"))),
+
+			),
+			gr.New(&Dropdown{}).CreateElement(c.This.Props()),
+		),
 		el.Div(gr.CSS("content"),
-			el.Header1(gr.Text(c.Props().String("Title"))),
 			response,
 		),
 	)
@@ -43,11 +50,11 @@ func (c Content) ComponentDidMount() {
 }
 
 // Implements the ComponentWillUnmount interface
-func (g Content) ComponentWillUnmount() {
+func (c Content) ComponentWillUnmount() {
 	// TODO Handle query cancel
 }
 
 // Implements the ShouldComponentUpdate interface.
-func (g Content) ShouldComponentUpdate(this *gr.This, next gr.Cops) bool {
-	return g.State().HasChanged(next.State, "assetList")
+func (c Content) ShouldComponentUpdate(this *gr.This, next gr.Cops) bool {
+	return c.State().HasChanged(next.State, "assetList")
 }
