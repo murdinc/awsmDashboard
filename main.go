@@ -13,8 +13,17 @@ var (
 
 	pages = components.Pages{
 		"Dashboard": components.Page{
-			Route:       "/",
-			ApiEndpoint: "/assets/",
+			Route: "/",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Widget",
+					Id:   "NewWidget",
+				},
+				components.DropdownOption{
+					Name: "Edit Widget",
+					Id:   "EditWidget",
+				},
+			},
 		},
 		"Instances": components.Page{
 			Route:       "/instances",
@@ -76,9 +85,7 @@ var (
 
 	reactRouter   = js.Global.Get("ReactRouter")
 	routerHistory = grouter.History{Object: reactRouter.Get("browserHistory")}
-
-	// WithRouter makes this.props.router happen.
-	appComponent = gr.New(new(app), gr.Apply(grouter.WithRouter))
+	appComponent  = gr.New(new(app))
 )
 
 func main() {

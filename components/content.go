@@ -1,12 +1,19 @@
 package components
 
 import (
+	"fmt"
+
 	"github.com/bep/gr"
 	"github.com/bep/gr/el"
 )
 
 type Content struct {
 	*gr.This
+}
+
+// Implements the StateInitializer interface.
+func (c Content) GetInitialState() gr.State {
+	return gr.State{"querying": false, "error": nil, "assetList": nil}
 }
 
 func (c Content) Render() gr.Component {
@@ -17,11 +24,10 @@ func (c Content) Render() gr.Component {
 	elem := el.Div(gr.CSS("content-wrapper"),
 		el.Div(gr.CSS("content-header"),
 			el.Header1(
-				gr.Text(c.Props().String("Title")+" "),
-				//el.Button(gr.CSS("btn", "btn-primary", "btn-xs"), el.Italic(gr.CSS("fa", "fa-gear"))),
-
+				gr.Text(c.Props().String("activePage")+" "),
 			),
-			gr.New(&Dropdown{}).CreateElement(c.This.Props()),
+			//gr.New(&Dropdown{}).CreateElement(c.This.Props()),
+			c.Children().Element(),
 		),
 		el.Div(gr.CSS("content"),
 			response,
@@ -31,8 +37,12 @@ func (c Content) Render() gr.Component {
 	if assets := c.State().Interface("assetList"); assets != nil {
 		table := TableBuilder(assets)
 		table.Modify(response)
+	} else if c.State().Bool("querying") {
+		gr.Text("Loading...").Modify(response)
+	} else if errStr := c.State().Interface("error"); errStr != nil {
+		gr.Text(errStr).Modify(response)
 	} else {
-		gr.Text("loading...").Modify(response)
+		gr.Text("Nothing here!").Modify(response)
 	}
 
 	return elem
@@ -40,21 +50,67 @@ func (c Content) Render() gr.Component {
 
 // Implements the ComponentDidMount interface
 func (c Content) ComponentDidMount() {
-	resp, err := QueryAPI("//localhost:8081/api" + c.Props().String("ApiEndpoint"))
-	if err != nil {
-		panic(err)
-		// TODO handle query failures
+
+	if endpoint := c.Props().String("apiEndpoint"); endpoint != "" {
+
+		c.SetState(gr.State{"querying": true})
+
+		resp, err := QueryAPI("//localhost:8081/api" + endpoint)
+		if !c.IsMounted() {
+			return
+		}
+		if err != nil {
+			c.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			return
+		}
+
+		c.SetState(gr.State{"querying": false, "assetList": resp})
+
 	}
-
-	c.SetState(gr.State{"assetList": resp})
-}
-
-// Implements the ComponentWillUnmount interface
-func (c Content) ComponentWillUnmount() {
-	// TODO Handle query cancel
 }
 
 // Implements the ShouldComponentUpdate interface.
 func (c Content) ShouldComponentUpdate(this *gr.This, next gr.Cops) bool {
-	return c.State().HasChanged(next.State, "assetList")
+	return c.State().HasChanged(next.State, "assetList") &&
+		c.State().HasChanged(next.State, "querying") &&
+		c.State().HasChanged(next.State, "error")
 }
+
+/*
+
+	// Implements the ChildContext interface.
+	func (c Content) GetChildContext() gr.Context {
+		return gr.Context{}
+	}
+
+	// Implements the ComponentWillUpdate interface
+	func (c Content) ComponentWillUpdate(next gr.Cops) {
+		log.Println("ComponentWillUpdate")
+		log.Println(c.Props().String("activePage"))
+	}
+
+	// Implements the ComponentWillReceiveProps interface
+	func (c Content) ComponentWillReceiveProps(data gr.Cops) {
+		log.Println("ComponentWillReceiveProps")
+		log.Println(c.Props().String("activePage"))
+	}
+
+	// Implements the ComponentDidUpdate interface
+	func (c Content) ComponentDidUpdate(data gr.Cops) {
+		log.Println("ComponentDidUpdate")
+		log.Println(c.Props().String("activePage"))
+	}
+
+	// Implements the ComponentWillMount interface
+	func (c Content) ComponentWillMount() {
+		log.Println("ComponentWillMount")
+		log.Println(c.Props().String("activePage"))
+	}
+
+	// Implements the ComponentWillUnmount interface
+	func (c Content) ComponentWillUnmount() {
+		log.Println("ComponentWillUnmount")
+		log.Println(c.Props().String("activePage"))
+	}
+
+*/

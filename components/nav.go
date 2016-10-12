@@ -15,20 +15,21 @@ type Nav struct {
 type Pages map[string]Page
 
 type Page struct {
-	Title       string
-	ApiEndpoint string
-	Route       string
-	Component   *gr.Component
+	ApiEndpoint     string
+	Route           string
+	DropdownOptions []DropdownOption
 }
 
 // Implements the Renderer interface.
 func (c Nav) Render() gr.Component {
 
-	links := []gr.Modifier{gr.CSS("nav-menu", "nav-pills", "nav-stacked")}
+	links := el.UnorderedList(
+		gr.CSS("nav-menu", "nav-pills", "nav-stacked"),
+	)
 
 	for name, page := range c.Pages {
 		if page.Route != "/" {
-			links = append(links, c.createLinkListItem(page.Route, name))
+			c.createLinkListItem(page.Route, name).Modify(links)
 		}
 	}
 
@@ -39,17 +40,15 @@ func (c Nav) Render() gr.Component {
 			gr.Text(" "),
 			grouter.Link("/", c.Brand),
 		),
-		el.UnorderedList(links...),
+		links,
 	)
 
 	return elem
 }
 
 func (c Nav) createLinkListItem(path, title string) gr.Modifier {
-
 	return el.ListItem(
 		grouter.MarkIfActive(c.Props(), path),
 		grouter.Link(path, title),
 	)
-
 }

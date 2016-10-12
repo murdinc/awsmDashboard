@@ -68,11 +68,11 @@ html,body {
     background: #2c3e50;
     color: #FFF;
     float: left;
-    height: 100%;
     width: 100%;
     position: absolute;
     margin: 0;
     padding: 0;
+    padding-bottom: 50px;
 }
 
 .nav-menu li a {
