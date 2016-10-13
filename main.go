@@ -16,70 +16,225 @@ var (
 			Route: "/",
 			DropdownOptions: []components.DropdownOption{
 				components.DropdownOption{
-					Name: "New Widget",
-					Id:   "NewWidget",
+					Name: "New Instance",
+					Id:   "New",
 				},
 				components.DropdownOption{
-					Name: "Edit Widget",
-					Id:   "EditWidget",
+					Name: "Edit Classes",
+					Id:   "Edit",
 				},
 			},
+			ClassEndpoint: "/classes/instances",
 		},
 		"Instances": components.Page{
-			Route:       "/instances",
-			ApiEndpoint: "/assets/instances",
+			Route: "/instances",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Instance",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/instances",
+			ClassEndpoint: "/classes/instances",
 		},
 		"Volumes": components.Page{
-			Route:       "/volumes",
-			ApiEndpoint: "/assets/volumes",
+			Route: "/volumes",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Volume",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/volumes",
+			ClassEndpoint: "/classes/volumes",
 		},
 		"Images": components.Page{
-			Route:       "/images",
-			ApiEndpoint: "/assets/images",
+			Route: "/images",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Image",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/images",
+			ClassEndpoint: "/classes/images",
 		},
 		"Snapshots": components.Page{
-			Route:       "/snapshots",
-			ApiEndpoint: "/assets/snapshots",
+			Route: "/snapshots",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Snapshot",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/snapshots",
+			ClassEndpoint: "/classes/snapshots",
 		},
 		"Vpcs": components.Page{
-			Route:       "/vpcs",
-			ApiEndpoint: "/assets/vpcs",
+			Route: "/vpcs",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Vpc",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/vpcs",
+			ClassEndpoint: "/classes/vpcs",
 		},
 		"Subnets": components.Page{
-			Route:       "/subnets",
-			ApiEndpoint: "/assets/subnets",
+			Route: "/subnets",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Subnet",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/subnets",
+			ClassEndpoint: "/classes/subnets",
 		},
 		"Security Groups": components.Page{
-			Route:       "/securitygroups",
-			ApiEndpoint: "/assets/securitygroups",
+			Route: "/securitygroups",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Security Group",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/securitygroups",
+			ClassEndpoint: "/classes/securitygroups",
 		},
 		"Addresses": components.Page{
-			Route:       "/addresses",
-			ApiEndpoint: "/assets/addresses",
+			Route: "/addresses",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Address",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/addresses",
+			ClassEndpoint: "/classes/addresses",
 		},
 		"Alarms": components.Page{
-			Route:       "/alarms",
-			ApiEndpoint: "/assets/alarms",
+			Route: "/alarms",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Alarm",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/alarms",
+			ClassEndpoint: "/classes/alarms",
 		},
 		"Keypairs": components.Page{
-			Route:       "/keypairs",
-			ApiEndpoint: "/assets/keypairs",
+			Route: "/keypairs",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Key Pair",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/keypairs",
+			ClassEndpoint: "/classes/keypairs",
 		},
 		"Launch Configurations": components.Page{
-			Route:       "/launchconfigurations",
-			ApiEndpoint: "/assets/launchconfigurations",
+			Route: "/launchconfigurations",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Launch Configuration",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/launchconfigurations",
+			ClassEndpoint: "/classes/launchconfigurations",
 		},
 		"Load Balancers": components.Page{
-			Route:       "/loadbalancers",
-			ApiEndpoint: "/assets/loadbalancers",
+			Route: "/loadbalancers",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Load Balancer",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/loadbalancers",
+			ClassEndpoint: "/classes/loadbalancers",
 		},
 		"Scaling Policies": components.Page{
-			Route:       "/scalingpolicies",
-			ApiEndpoint: "/assets/scalingpolicies",
+			Route: "/scalingpolicies",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New Scaling Policy",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/scalingpolicies",
+			ClassEndpoint: "/classes/scalingpolicies",
 		},
 		"SimpleDB Domains": components.Page{
-			Route:       "/simpledbdomains",
-			ApiEndpoint: "/assets/simpledbdomains",
+			Route: "/simpledbdomains",
+			DropdownOptions: []components.DropdownOption{
+				components.DropdownOption{
+					Name: "New SimpleDB Domain",
+					Id:   "New",
+				},
+				components.DropdownOption{
+					Name: "Edit Classes",
+					Id:   "Edit",
+				},
+			},
+			AssetEndpoint: "/assets/simpledbdomains",
+			ClassEndpoint: "/classes/simpledbdomains",
 		},
 	}
 

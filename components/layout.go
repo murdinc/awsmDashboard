@@ -17,19 +17,10 @@ func (l Layout) Render() gr.Component {
 
 	return el.Div(
 		gr.CSS("main-wrapper"),
-
 		// Nav
 		gr.New(&Nav{Brand: l.Brand, Pages: l.Pages}).CreateElement(l.Props()), // layout passes the router to the nav
 
 		//Content
-		gr.New(&Content{}).CreateElement(gr.Props{"activePage": l.ActivePage, "apiEndpoint": l.Pages[l.ActivePage].ApiEndpoint},
-			gr.New(&Dropdown{DropdownOptions: l.Pages[l.ActivePage].DropdownOptions}).CreateElement(gr.Props{}),
-			//gr.New(&Dropdown{DropdownOptions: l.Pages[l.ActivePage].DropdownOptions}).CreateElement(gr.Props{}),
-		),
+		gr.New(&Content{Page: l.Pages[l.ActivePage]}).CreateElement(gr.Props{"activePage": l.ActivePage}),
 	)
-}
-
-// Implements the ComponentWillReceiveProps interface
-func (l Layout) ComponentWillReceiveProps(data gr.Cops) {
-	println("ComponentWillReceiveProps")
 }

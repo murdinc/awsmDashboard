@@ -15,9 +15,10 @@ type Nav struct {
 type Pages map[string]Page
 
 type Page struct {
-	ApiEndpoint     string
 	Route           string
 	DropdownOptions []DropdownOption
+	ClassEndpoint   string
+	AssetEndpoint   string
 }
 
 // Implements the Renderer interface.

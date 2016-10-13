@@ -8,6 +8,7 @@ import (
 type Dropdown struct {
 	*gr.This
 	DropdownOptions []DropdownOption
+	ClassEndpoint   string
 }
 
 type DropdownOption struct {
@@ -38,7 +39,7 @@ func (d Dropdown) Render() gr.Component {
 
 	for _, option := range d.DropdownOptions {
 		el.ListItem(el.Anchor(gr.Data("toggle", "modal"), gr.Data("target", "#"+option.Id), gr.Text(option.Name))).Modify(dropdownMenu)
-		gr.New(&Modal{Id: option.Id, Title: option.Name}).CreateElement(gr.Props{}).Modify(dropdown)
+		gr.New(&Modal{Id: option.Id, Title: option.Name, ClassEndpoint: d.ClassEndpoint}).CreateElement(gr.Props{}).Modify(dropdown)
 	}
 
 	dropdownMenu.Modify(dropdown)

@@ -5,10 +5,12 @@ import (
 
 	"github.com/bep/gr"
 	"github.com/bep/gr/el"
+	"github.com/murdinc/awsmDashboard/helpers"
 )
 
 type Content struct {
 	*gr.This
+	Page Page
 }
 
 // Implements the StateInitializer interface.
@@ -26,8 +28,7 @@ func (c Content) Render() gr.Component {
 			el.Header1(
 				gr.Text(c.Props().String("activePage")+" "),
 			),
-			//gr.New(&Dropdown{}).CreateElement(c.This.Props()),
-			c.Children().Element(),
+			gr.New(&Dropdown{DropdownOptions: c.Page.DropdownOptions, ClassEndpoint: c.Page.ClassEndpoint}).CreateElement(gr.Props{}),
 		),
 		el.Div(gr.CSS("content"),
 			response,
@@ -35,7 +36,7 @@ func (c Content) Render() gr.Component {
 	)
 
 	if assets := c.State().Interface("assetList"); assets != nil {
-		table := TableBuilder(assets)
+		table := AssetTableBuilder(assets) // Build the table
 		table.Modify(response)
 	} else if c.State().Bool("querying") {
 		gr.Text("Loading...").Modify(response)
@@ -51,11 +52,11 @@ func (c Content) Render() gr.Component {
 // Implements the ComponentDidMount interface
 func (c Content) ComponentDidMount() {
 
-	if endpoint := c.Props().String("apiEndpoint"); endpoint != "" {
+	if endpoint := c.Page.AssetEndpoint; endpoint != "" {
 
 		c.SetState(gr.State{"querying": true})
 
-		resp, err := QueryAPI("//localhost:8081/api" + endpoint)
+		resp, err := helpers.QueryAPI("//localhost:8081/api" + endpoint)
 		if !c.IsMounted() {
 			return
 		}

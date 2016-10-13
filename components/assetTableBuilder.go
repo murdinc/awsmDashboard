@@ -9,7 +9,7 @@ import (
 	"github.com/murdinc/awsm/models"
 )
 
-func TableBuilder(al interface{}) *gr.Element {
+func AssetTableBuilder(al interface{}) *gr.Element {
 
 	assetList := al.([]byte)
 
@@ -146,7 +146,7 @@ func TableBuilder(al interface{}) *gr.Element {
 		}
 
 	default:
-		println("Asset Type not found in TableBuilder switch:")
+		println("Asset Type not found in AssetTableBuilder switch:")
 		println(assetType)
 	}
 
