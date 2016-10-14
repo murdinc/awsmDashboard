@@ -2,12 +2,75 @@ package components
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/Jeffail/gabs"
 	"github.com/bep/gr"
 	"github.com/bep/gr/el"
 	"github.com/murdinc/awsm/models"
+	"github.com/murdinc/awsmDashboard/helpers"
 )
+
+type AssetTable struct {
+	*gr.This
+	AssetEndpoint string
+}
+
+// Implements the StateInitializer interface.
+func (a AssetTable) GetInitialState() gr.State {
+	return gr.State{"querying": false, "error": nil, "assetList": nil}
+}
+
+func (a AssetTable) Render() gr.Component {
+
+	// Table placeholder
+	response := el.Div()
+
+	elem := el.Div(gr.CSS("content"),
+		response,
+	)
+
+	if assets := a.State().Interface("assetList"); assets != nil {
+		table := AssetTableBuilder(assets) // Build the table
+		table.Modify(response)
+	} else if a.State().Bool("querying") {
+		gr.Text("Loading...").Modify(response)
+	} else if errStr := a.State().Interface("error"); errStr != nil {
+		gr.Text(errStr).Modify(response)
+	} else {
+		gr.Text("Nothing here!").Modify(response)
+	}
+
+	return elem
+}
+
+// Implements the ComponentDidMount interface
+func (a AssetTable) ComponentDidMount() {
+
+	if endpoint := a.AssetEndpoint; endpoint != "" {
+
+		a.SetState(gr.State{"querying": true})
+
+		resp, err := helpers.QueryAPI("//localhost:8081/api" + endpoint)
+		if !a.IsMounted() {
+			return
+		}
+		if err != nil {
+			a.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			return
+		}
+
+		a.SetState(gr.State{"querying": false, "assetList": resp})
+
+	}
+}
+
+// Implements the ShouldComponentUpdate interface.
+func (a AssetTable) ShouldComponentUpdate(this *gr.This, next gr.Cops) bool {
+	return a.State().HasChanged(next.State, "assetList") &&
+		a.State().HasChanged(next.State, "querying") &&
+		a.State().HasChanged(next.State, "error")
+}
 
 func AssetTableBuilder(al interface{}) *gr.Element {
 

@@ -12,15 +12,6 @@ type Nav struct {
 	Brand string
 }
 
-type Pages map[string]Page
-
-type Page struct {
-	Route           string
-	DropdownOptions []DropdownOption
-	ClassEndpoint   string
-	AssetEndpoint   string
-}
-
 // Implements the Renderer interface.
 func (c Nav) Render() gr.Component {
 
