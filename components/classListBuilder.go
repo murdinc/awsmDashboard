@@ -113,8 +113,14 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			buildClassButton(className, keys, values, classListGroup)
 		}
 
-	//case "loadbalancers":
-	// TODO ?
+	case "loadbalancers":
+		var cType config.LoadBalancerClass
+		for className, class := range classes {
+			cJson := class.Bytes()
+			json.Unmarshal(cJson, &cType)
+			keys, values := config.ExtractAwsmList(cType)
+			buildClassButton(className, keys, values, classListGroup)
+		}
 
 	case "scalingpolicies":
 		var cType config.ScalingPolicyClass
