@@ -13,12 +13,11 @@ import (
 
 type AssetTable struct {
 	*gr.This
-	AssetEndpoint string
 }
 
 // Implements the StateInitializer interface.
 func (a AssetTable) GetInitialState() gr.State {
-	return gr.State{"querying": false, "error": nil, "assetList": nil}
+	return gr.State{"querying": false, "error": "", "assetList": nil}
 }
 
 func (a AssetTable) Render() gr.Component {
@@ -35,7 +34,7 @@ func (a AssetTable) Render() gr.Component {
 		table.Modify(response)
 	} else if a.State().Bool("querying") {
 		gr.Text("Loading...").Modify(response)
-	} else if errStr := a.State().Interface("error"); errStr != nil {
+	} else if errStr := a.State().String("error"); errStr != "" {
 		gr.Text(errStr).Modify(response)
 	} else {
 		gr.Text("Nothing here!").Modify(response)
@@ -47,7 +46,7 @@ func (a AssetTable) Render() gr.Component {
 // Implements the ComponentDidMount interface
 func (a AssetTable) ComponentDidMount() {
 
-	if endpoint := a.AssetEndpoint; endpoint != "" {
+	if endpoint := a.Props().String("assetEndpoint"); endpoint != "" {
 
 		a.SetState(gr.State{"querying": true})
 

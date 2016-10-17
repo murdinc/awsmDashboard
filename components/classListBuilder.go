@@ -7,10 +7,11 @@ import (
 	"github.com/bep/gr"
 	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
+	"github.com/bep/gr/evt"
 	"github.com/murdinc/awsm/config"
 )
 
-func ClassListBuilder(cl interface{}) *gr.Element {
+func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 
 	classList := cl.([]byte)
 
@@ -32,7 +33,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	case "instances":
@@ -41,7 +42,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	case "volumes":
@@ -50,7 +51,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	case "images":
@@ -59,7 +60,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	//case "keypairs":
@@ -71,7 +72,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	case "vpcs":
@@ -80,7 +81,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	case "subnets":
@@ -89,7 +90,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	case "securitygroups":
@@ -98,7 +99,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	//case "addresses":
@@ -110,7 +111,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	case "loadbalancers":
@@ -119,7 +120,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	case "scalingpolicies":
@@ -128,7 +129,7 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
 			keys, values := config.ExtractAwsmList(cType)
-			buildClassButton(className, keys, values, classListGroup)
+			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
 	//case "simpledbdomains":
@@ -142,11 +143,17 @@ func ClassListBuilder(cl interface{}) *gr.Element {
 	return classListGroup
 }
 
-func buildClassButton(name string, keys []string, values []string, classListGroup *gr.Element) {
+func buildClassButton(name string, keys []string, values []string, classListGroup *gr.Element, onClick func(string)) {
+
+	clickListener := func(event *gr.Event) {
+		onClick(name)
+	}
 
 	button := el.Button(
 		attr.Type("button"),
 		gr.CSS("list-group-item"),
+		attr.ID(name),
+		evt.Click(clickListener),
 		el.Header5(
 			gr.CSS("list-group-item-heading"),
 			gr.Text(name),

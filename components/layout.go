@@ -15,10 +15,11 @@ type Layout struct {
 type Pages map[string]Page
 
 type Page struct {
-	Route           string
-	DropdownOptions []DropdownOption
-	ClassEndpoint   string
-	AssetEndpoint   string
+	PageType      string
+	ClassType     string
+	Route         string
+	ClassEndpoint string
+	AssetEndpoint string
 }
 
 // Implements the Renderer interface.

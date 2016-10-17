@@ -134,6 +134,10 @@ html,body {
     border-color: #5f80a0;
 }
 
+.btn {
+    margin-right: 10px;
+}
+
 .modal-header {
     background-color: #2c3e50;
 }

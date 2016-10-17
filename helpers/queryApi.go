@@ -9,6 +9,7 @@ import (
 )
 
 func QueryAPI(url string) ([]byte, error) {
+	println("Querying: " + url)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 
 	go func() {

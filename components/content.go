@@ -17,8 +17,8 @@ func (c Content) Render() gr.Component {
 			el.Header1(
 				gr.Text(c.Props().String("activePage")+" "),
 			),
-			gr.New(&Dropdown{DropdownOptions: c.Page.DropdownOptions, ClassEndpoint: c.Page.ClassEndpoint}).CreateElement(gr.Props{}),
+			gr.New(&AssetDropdownMenu{}).CreateElement(gr.Props{"classEndpoint": c.Page.ClassEndpoint, "classType": c.Page.ClassType, "pageType": c.Page.PageType}),
 		),
-		gr.New(&AssetTable{AssetEndpoint: c.Page.AssetEndpoint}).CreateElement(gr.Props{}),
+		gr.New(&AssetTable{}).CreateElement(gr.Props{"assetEndpoint": c.Page.AssetEndpoint}),
 	)
 }
