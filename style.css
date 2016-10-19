@@ -145,3 +145,7 @@ html,body {
 .modal-title {
     color: #ffffff;
 }
+
+.modal-body h3 {
+    margin-top: 5px;
+}

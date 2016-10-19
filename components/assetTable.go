@@ -180,6 +180,15 @@ func AssetTableBuilder(al interface{}) *gr.Element {
 			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
+	case "autoscalegroups":
+		var aType models.AutoScaleGroup
+
+		for i, a := range assets {
+			aJson := a.Bytes()
+			json.Unmarshal(aJson, &aType)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
+		}
+
 	case "loadbalancers":
 		var aType models.LoadBalancer
 

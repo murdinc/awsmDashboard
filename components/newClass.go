@@ -29,6 +29,13 @@ func (n NewClass) Render() gr.Component {
 		// STEP 1
 
 		nextListener := func(event *gr.Event) {
+
+			className := n.State().String("className")
+
+			if className == "" {
+
+			}
+
 			n.SetState(gr.State{"step": 2})
 		}
 

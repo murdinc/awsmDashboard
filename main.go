@@ -96,6 +96,13 @@ var (
 			PageType:      "Launch Configuration",
 			ClassType:     "launchconfigurations",
 		},
+		"Autoscale Groups": components.Page{
+			Route:         "/autoscalegroups",
+			AssetEndpoint: "/assets/autoscalegroups",
+			ClassEndpoint: "/classes/autoscalegroups",
+			PageType:      "Autoscale Group",
+			ClassType:     "autoscalegroups",
+		},
 		"Load Balancers": components.Page{
 			Route:         "/loadbalancers",
 			AssetEndpoint: "/assets/loadbalancers",
