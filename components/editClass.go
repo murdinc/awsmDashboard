@@ -12,16 +12,18 @@ type EditClass struct {
 	*gr.This
 }
 
-// Implements the StateInitializer interface.
+// Implements the StateInitializer interface
 func (e EditClass) GetInitialState() gr.State {
 	return gr.State{"selectedClass": "", "querying": false, "error": "", "classData": nil}
 }
 
 func (e *EditClass) selectClass(name string) {
 	go func() {
-		if endpoint := e.Props().String("classEndpoint"); endpoint != "" {
+
+		if apiType := e.Props().String("apiType"); apiType != "" {
 			e.SetState(gr.State{"querying": true})
-			resp, err := helpers.QueryAPI("//localhost:8081/api" + endpoint + "/name/" + name)
+			endpoint := "//localhost:8081/api/classes/" + apiType + "/name/" + name
+			resp, err := helpers.QueryAPI(endpoint)
 			if !e.IsMounted() {
 				return
 			}

@@ -12,16 +12,17 @@ type NewAsset struct {
 	*gr.This
 }
 
-// Implements the StateInitializer interface.
+// Implements the StateInitializer interface
 func (n NewAsset) GetInitialState() gr.State {
 	return gr.State{"selectedClass": "", "querying": false, "error": "", "classData": nil}
 }
 
 func (n *NewAsset) selectClass(name string) {
 	go func() {
-		if endpoint := n.Props().String("classEndpoint"); endpoint != "" {
+		if apiType := n.Props().String("apiType"); apiType != "" {
 			n.SetState(gr.State{"querying": true})
-			resp, err := helpers.QueryAPI("//localhost:8081/api" + endpoint + "/name/" + name)
+			endpoint := "//localhost:8081/api/classes/" + apiType + "/name/" + name
+			resp, err := helpers.QueryAPI(endpoint)
 			if !n.IsMounted() {
 				return
 			}

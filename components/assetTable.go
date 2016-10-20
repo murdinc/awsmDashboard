@@ -15,7 +15,7 @@ type AssetTable struct {
 	*gr.This
 }
 
-// Implements the StateInitializer interface.
+// Implements the StateInitializer interface
 func (a AssetTable) GetInitialState() gr.State {
 	return gr.State{"querying": false, "error": "", "assetList": nil}
 }
@@ -45,12 +45,11 @@ func (a AssetTable) Render() gr.Component {
 
 // Implements the ComponentDidMount interface
 func (a AssetTable) ComponentDidMount() {
-
-	if endpoint := a.Props().String("assetEndpoint"); endpoint != "" {
-
+	if apiType := a.Props().String("apiType"); apiType != "" {
 		a.SetState(gr.State{"querying": true})
+		endpoint := "//localhost:8081/api/assets/" + apiType
 
-		resp, err := helpers.QueryAPI("//localhost:8081/api" + endpoint)
+		resp, err := helpers.QueryAPI(endpoint)
 		if !a.IsMounted() {
 			return
 		}
@@ -60,7 +59,6 @@ func (a AssetTable) ComponentDidMount() {
 		}
 
 		a.SetState(gr.State{"querying": false, "assetList": resp})
-
 	}
 }
 

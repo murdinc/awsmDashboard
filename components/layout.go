@@ -15,11 +15,9 @@ type Layout struct {
 type Pages map[string]Page
 
 type Page struct {
-	PageType      string
-	ClassType     string
-	Route         string
-	ClassEndpoint string
-	AssetEndpoint string
+	Route   string
+	ApiType string
+	Type    string
 }
 
 // Implements the Renderer interface.
