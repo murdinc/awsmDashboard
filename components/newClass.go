@@ -31,6 +31,14 @@ func (n NewClass) checkClassName(className string) {
 			return
 		}
 
+		// Make sure the classname doesn't include any numbers
+		for _, char := range className {
+			if char >= '0' && char <= '9' {
+				n.SetState(gr.State{"error": "Class name cannot contain numbers", "querying": false})
+				return
+			}
+		}
+
 		// Make sure this class name doesn't already exist
 		if apiType := n.Props().String("apiType"); apiType != "" {
 			endpoint := "//localhost:8081/api/classes/" + apiType + "/name/" + className
@@ -97,7 +105,6 @@ func (n NewClass) Render() gr.Component {
 				),
 			),
 			el.Button(
-				//attr.Type("submit"),
 				evt.Click(nextListener).PreventDefault(),
 				gr.CSS("btn", "btn-primary"),
 				gr.Text("Next"),
@@ -105,6 +112,7 @@ func (n NewClass) Render() gr.Component {
 		)
 
 		// Disables the form while querying
+		// but does it work?
 		if state.Bool("querying") {
 			attr.Disabled("").Modify(form)
 		}
