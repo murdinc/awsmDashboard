@@ -1,184 +1,127 @@
 package components
 
 import (
-	"encoding/json"
-
 	"github.com/Jeffail/gabs"
 	"github.com/bep/gr"
 	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
 	"github.com/murdinc/awsm/config"
+	"github.com/murdinc/awsmDashboard/components/forms"
 )
 
-func EditClassFormBuilder(classBytes interface{}) *gr.Element {
+func EditClassFormBuilder(classBytes []byte) (*gr.ReactComponent, *gabs.Container) {
 
-	jsonParsed, _ := gabs.ParseJSON(classBytes.([]byte))
-	className := jsonParsed.S("className").Data().(string)
+	jsonParsed, _ := gabs.ParseJSON(classBytes)
 	classType := jsonParsed.S("classType").Data().(string)
-	class := jsonParsed.S("class").Bytes()
 
 	switch classType {
 
 	case "alarms":
-		var cType config.AlarmClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "instances":
-		var cType config.InstanceClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "volumes":
-		var cType config.VolumeClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "images":
-		var cType config.ImageClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
-	//case "keypairs":
-	// TODO ?
+	case "keypairs":
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "snapshots":
-		var cType config.SnapshotClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "vpcs":
-		var cType config.VpcClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "subnets":
-		var cType config.SubnetClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "securitygroups":
-		var cType config.SecurityGroupClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
-	//case "addresses":
-	// TODO ?
+	case "addresses":
+	//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "launchconfigurations":
-		var cType config.LaunchConfigurationClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "loadbalancers":
-		var cType config.LoadBalancerClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "scalingpolicies":
-		var cType config.ScalingPolicyClass
-		json.Unmarshal(class, &cType)
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
+	//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+
+	case "simpledbdomains":
+	//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+
+	default:
+		println("Class Type not found in EditClassFormBuilder switch:")
+		println(classType)
+	}
+
+	return nil, nil
+}
+
+func NewClassFormBuilder(classType string) *gr.ReactComponent {
+
+	switch classType {
+
+	case "alarms":
+		//return gr.New(&forms.InstanceClassForm{})
+
+	case "instances":
+		return gr.New(&forms.InstanceClassForm{})
+
+	case "volumes":
+
+	case "images":
+		//return gr.New(&forms.InstanceClassForm{})
+
+	case "keypairs":
+	//return gr.New(&forms.InstanceClassForm{})
+
+	case "snapshots":
+		//return gr.New(&forms.InstanceClassForm{})
+
+	case "vpcs":
+		//return gr.New(&forms.InstanceClassForm{})
+
+	case "subnets":
+		//return gr.New(&forms.InstanceClassForm{})
+
+	case "securitygroups":
+		//return gr.New(&forms.InstanceClassForm{})
+
+	case "addresses":
+	//return gr.New(&forms.InstanceClassForm{})
+
+	case "launchconfigurations":
+		//return gr.New(&forms.InstanceClassForm{})
+
+	case "loadbalancers":
+		//return gr.New(&forms.InstanceClassForm{})
+
+	case "scalingpolicies":
+		//return gr.New(&forms.InstanceClassForm{})
 
 	//case "simpledbdomains":
 	// TODO ?
 
 	default:
-		println("Class Type not found in ClassFormBuilder switch:")
+		println("Class Type not found in NewClassFormBuilder switch:")
 		println(classType)
 	}
 
 	return nil
 }
 
-func NewClassFormBuilder(className, classType string) *gr.Element {
+func BuildClassForm(className string, cType interface{}) *gr.Element {
 
-	switch classType {
-
-	case "alarms":
-		var cType config.AlarmClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	case "instances":
-		var cType config.InstanceClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	case "volumes":
-		var cType config.VolumeClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	case "images":
-		var cType config.ImageClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	//case "keypairs":
-	// TODO ?
-
-	case "snapshots":
-		var cType config.SnapshotClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	case "vpcs":
-		var cType config.VpcClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	case "subnets":
-		var cType config.SubnetClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	case "securitygroups":
-		var cType config.SecurityGroupClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	//case "addresses":
-	// TODO ?
-
-	case "launchconfigurations":
-		var cType config.LaunchConfigurationClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	case "loadbalancers":
-		var cType config.LoadBalancerClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	case "scalingpolicies":
-		var cType config.ScalingPolicyClass
-		keys, values := config.ExtractAwsmList(cType)
-		return BuildClassForm(className, keys, values)
-
-	//case "simpledbdomains":
-	// TODO ?
-
-	default:
-		println("Class Type not found in ClassFormBuilder switch:")
-		println(classType)
-	}
-
-	return nil
-}
-
-func BuildClassForm(className string, keys []string, values []string) *gr.Element {
+	keys, values := config.ExtractAwsmClass(cType)
 
 	classEdit := el.Div(
 		el.Header3(gr.Text(className)),

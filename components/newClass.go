@@ -20,6 +20,73 @@ func (n NewClass) GetInitialState() gr.State {
 	return gr.State{"step": 1, "querying": false, "error": "", "className": ""}
 }
 
+func (n NewClass) Render() gr.Component {
+
+	state := n.State()
+	props := n.Props()
+
+	// Response placeholder
+	response := el.Div()
+
+	// Print any alerts
+	helpers.ErrorElem(state.String("error")).Modify(response)
+
+	if state.Int("step") == 1 {
+
+		// STEP 1
+
+		form := el.Form(
+			el.Div(
+				gr.CSS("form-group"),
+				el.Label(
+					gr.Text("Name"),
+				),
+				el.Input(
+					attr.ClassName("form-control"),
+					attr.ID("className"),
+					attr.Placeholder("Class Name"),
+					attr.Value(state.String("className")),
+					evt.Change(n.storeValue),
+				),
+			),
+			el.Button(
+				evt.Click(n.stepOneNext).PreventDefault(),
+				gr.CSS("btn", "btn-primary"),
+				gr.Text("Next"),
+			),
+			el.Button(
+				evt.Click(n.closeButton).PreventDefault(),
+				gr.CSS("btn", "btn-secondary"),
+				gr.Text("Close"),
+			),
+		)
+
+		// Disables the form while querying
+		// but does it work?
+		if state.Bool("querying") {
+			attr.Disabled("").Modify(form)
+		}
+
+		form.Modify(response)
+
+	} else if state.Int("step") == 2 {
+
+		// STEP 2
+
+		classForm := NewClassFormBuilder(props.String("apiType"))
+
+		classForm.CreateElement(gr.Props{
+			"className":     state.String("className"),
+			"backButton":    n.stepTwoBack,
+			"apiType":       props.String("apiType"),
+			"hideAllModals": hideAllModals,
+		}).Modify(response)
+
+	}
+
+	return response
+}
+
 func (n NewClass) checkClassName(className string) {
 	n.SetState(gr.State{"querying": true, "error": ""})
 
@@ -42,7 +109,7 @@ func (n NewClass) checkClassName(className string) {
 		// Make sure this class name doesn't already exist
 		if apiType := n.Props().String("apiType"); apiType != "" {
 			endpoint := "//localhost:8081/api/classes/" + apiType + "/name/" + className
-			resp, err := helpers.QueryAPI(endpoint)
+			resp, err := helpers.GetAPI(endpoint)
 
 			if err != nil {
 				n.SetState(gr.State{"error": fmt.Sprintf("Error while querying endpoint: %s", endpoint), "querying": false})
@@ -64,91 +131,62 @@ func (n NewClass) checkClassName(className string) {
 	}()
 }
 
-func (n NewClass) Render() gr.Component {
+func (n NewClass) storeValue(event *gr.Event) {
+	id := event.Target().Get("id").String()
+	n.SetState(gr.State{id: event.TargetValue()})
+}
 
-	state := n.State()
-	props := n.Props()
+func (n NewClass) closeButton(*gr.Event) {
+	n.SetState(gr.State{"success": ""})
+	hideAllModals()
+}
 
-	// Response placeholder
-	response := el.Div()
+func (n NewClass) stepOneNext(*gr.Event) {
 
-	// Print any errors
-	helpers.ErrorElem(state.String("error")).Modify(response)
+	n.SetState(gr.State{"querying": true, "error": ""})
 
-	if state.Int("step") == 1 {
+	go func(className string) {
 
-		// STEP 1
-
-		// `Next` Button Listener
-		nextListener := func(*gr.Event) {
-			n.checkClassName(state.String("className"))
+		// Make sure the classname isn't empty
+		if className == "" {
+			n.SetState(gr.State{"error": "Class name cannot be empty", "querying": false})
+			return
 		}
 
-		// Store classname on event change
-		storeName := func(event *gr.Event) {
-			n.SetState(gr.State{"className": event.TargetValue()})
+		// Make sure the classname doesn't include any numbers
+		for _, char := range className {
+			if char >= '0' && char <= '9' {
+				n.SetState(gr.State{"error": "Class name cannot contain numbers", "querying": false})
+				return
+			}
 		}
 
-		form := el.Form(
-			el.Div(
-				gr.CSS("form-group"),
-				el.Label(
-					gr.Text("Name"),
-				),
-				el.Input(
-					attr.Type("name"),
-					attr.ClassName("form-control"),
-					attr.ID("name"),
-					attr.Placeholder("Class Name"),
-					attr.Value(state.String("className")),
-					evt.Change(storeName),
-				),
-			),
-			el.Button(
-				evt.Click(nextListener).PreventDefault(),
-				gr.CSS("btn", "btn-primary"),
-				gr.Text("Next"),
-			),
-		)
+		// Make sure this class name doesn't already exist
+		if apiType := n.Props().String("apiType"); apiType != "" {
+			endpoint := "//localhost:8081/api/classes/" + apiType + "/name/" + className
+			resp, err := helpers.GetAPI(endpoint)
 
-		// Disables the form while querying
-		// but does it work?
-		if state.Bool("querying") {
-			attr.Disabled("").Modify(form)
+			if err != nil {
+				n.SetState(gr.State{"error": fmt.Sprintf("Error while querying endpoint: %s", endpoint), "querying": false})
+				return
+			}
+
+			jsonParsed, _ := gabs.ParseJSON(resp)
+			exists := jsonParsed.S("success").Data().(bool)
+
+			if exists {
+				n.SetState(gr.State{"error": "Class name " + className + " already exists!", "querying": false})
+				return
+			}
+		} else {
+			n.SetState(gr.State{"error": "No API type, unable to query API", "querying": false})
+			return
 		}
+		n.SetState(gr.State{"error": "", "querying": false, "step": 2})
+	}(n.State().String("className"))
 
-		form.Modify(response)
+}
 
-	} else if state.Int("step") == 2 {
-
-		// STEP 2
-
-		NewClassFormBuilder(state.String("className"), props.String("apiType")).Modify(response)
-
-		backListener := func(event *gr.Event) {
-			n.SetState(gr.State{"step": 1})
-		}
-
-		el.Div(
-			gr.CSS("btn-toolbar"),
-
-			// Back Button
-			el.Button(
-				attr.Type("button"),
-				evt.Click(backListener).PreventDefault(),
-				gr.CSS("btn", "btn-secondary"),
-				gr.Text("Back"),
-			),
-
-			// Save Button
-			el.Button(
-				attr.Type("button"),
-				evt.Click(backListener).PreventDefault(),
-				gr.CSS("btn", "btn-primary"),
-				gr.Text("Save"),
-			),
-		).Modify(response)
-	}
-
-	return response
+func (n NewClass) stepTwoBack(event *gr.Event) {
+	n.SetState(gr.State{"step": 1})
 }

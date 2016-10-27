@@ -22,7 +22,7 @@ func (n *NewAsset) selectClass(name string) {
 		if apiType := n.Props().String("apiType"); apiType != "" {
 			n.SetState(gr.State{"querying": true})
 			endpoint := "//localhost:8081/api/classes/" + apiType + "/name/" + name
-			resp, err := helpers.QueryAPI(endpoint)
+			resp, err := helpers.GetAPI(endpoint)
 			if !n.IsMounted() {
 				return
 			}

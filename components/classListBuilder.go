@@ -32,7 +32,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -41,7 +41,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -50,7 +50,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -59,7 +59,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -71,7 +71,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -80,7 +80,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -89,7 +89,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -98,7 +98,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -110,7 +110,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -119,7 +119,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
@@ -128,7 +128,7 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 		for className, class := range classes {
 			cJson := class.Bytes()
 			json.Unmarshal(cJson, &cType)
-			keys, values := config.ExtractAwsmList(cType)
+			keys, values := config.ExtractAwsmClass(cType)
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 

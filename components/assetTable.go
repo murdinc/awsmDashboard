@@ -49,7 +49,7 @@ func (a AssetTable) ComponentDidMount() {
 		a.SetState(gr.State{"querying": true})
 		endpoint := "//localhost:8081/api/assets/" + apiType
 
-		resp, err := helpers.QueryAPI(endpoint)
+		resp, err := helpers.GetAPI(endpoint)
 		if !a.IsMounted() {
 			return
 		}

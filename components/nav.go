@@ -2,6 +2,7 @@ package components
 
 import (
 	"github.com/bep/gr"
+	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
 	"github.com/bep/grouter"
 )
@@ -31,6 +32,7 @@ func (c Nav) Render() gr.Component {
 			el.Italic(gr.CSS("fa", "fa-cogs")),
 			gr.Text(" "),
 			grouter.Link("/", c.Brand),
+			attr.Key("brand"),
 		),
 		links,
 	)
@@ -42,5 +44,6 @@ func (c Nav) createLinkListItem(path, title string) gr.Modifier {
 	return el.ListItem(
 		grouter.MarkIfActive(c.Props(), path),
 		grouter.Link(path, title),
+		attr.Key(title), // not handling the warning, apparently.
 	)
 }

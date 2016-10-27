@@ -4,10 +4,21 @@ import (
 	"github.com/bep/gr"
 	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
+	"github.com/gopherjs/jquery"
 )
 
 type Modal struct {
 	*gr.This
+}
+
+func hideAllModals() {
+	var jQuery = jquery.NewJQuery
+	jQuery(".modal").Call("modal", "hide")
+}
+
+func hideModal(id string) {
+	var jQuery = jquery.NewJQuery
+	jQuery("#"+id).Call("modal", "hide")
 }
 
 func (m Modal) onShow(event *gr.Event) {
@@ -22,6 +33,7 @@ func (m Modal) Render() gr.Component {
 		gr.CSS("modal", "fade"),
 		attr.ID(m.Props().String("id")),
 		attr.Role("dialog"),
+		attr.Ref(m.Props().String("id")),
 	)
 
 	modalDialog := el.Div(

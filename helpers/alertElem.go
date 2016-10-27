@@ -16,3 +16,15 @@ func ErrorElem(errStr string) *gr.Element {
 
 	return el.Div()
 }
+
+func SuccessElem(successStr string) *gr.Element {
+	if successStr != "" {
+		return el.Div(
+			gr.CSS("alert", "alert-success", "fade", "in"),
+			el.Strong(gr.Text("Success! ")),
+			gr.Text(successStr),
+		)
+	}
+
+	return el.Div()
+}
