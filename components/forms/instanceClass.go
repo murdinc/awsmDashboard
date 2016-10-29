@@ -78,7 +78,7 @@ func (i InstanceClassForm) Render() gr.Component {
 
 	if state.Int("step") == 1 {
 		if state.Bool("querying") {
-			gr.Text("Loading.......").Modify(response)
+			gr.Text("Loading...").Modify(response)
 		} else {
 			i.BuildClassForm(props.String("className"), state.Interface("classOptionsResp")).Modify(response)
 		}

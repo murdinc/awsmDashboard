@@ -62,7 +62,7 @@ func (i ImageClassForm) Render() gr.Component {
 
 	if state.Int("step") == 1 {
 		if state.Bool("querying") {
-			gr.Text("Loading.......").Modify(response)
+			gr.Text("Loading...").Modify(response)
 		} else {
 			i.BuildClassForm(props.String("className"), state.Interface("classOptionsResp")).Modify(response)
 		}
@@ -116,6 +116,7 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 
 	classEditForm := el.Form()
 
+	textField("Instance ID", "instanceID", &state, i.storeValue).Modify(classEditForm) // select one?
 	checkbox("Propagate", "propagate", &state, i.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
 		selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], &state, i.storeValue).Modify(classEditForm)
@@ -124,8 +125,6 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 	if state.Bool("rotate") {
 		textField("Retain", "retain", &state, i.storeValue).Modify(classEditForm) // number
 	}
-
-	textField("Instance ID", "instanceID", &state, i.storeValue).Modify(classEditForm) // select one?
 
 	classEditForm.Modify(classEdit)
 

@@ -66,7 +66,7 @@ func (l LoadBalancerClassForm) Render() gr.Component {
 
 	if state.Int("step") == 1 {
 		if state.Bool("querying") {
-			gr.Text("Loading.......").Modify(response)
+			gr.Text("Loading...").Modify(response)
 		} else {
 			l.BuildClassForm(props.String("className"), state.Interface("classOptionsResp")).Modify(response)
 		}

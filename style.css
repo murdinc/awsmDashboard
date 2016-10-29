@@ -154,3 +154,7 @@ html,body {
 .modal-body h3 {
     margin-top: 5px;
 }
+
+dl {
+    overflow: auto;
+}
