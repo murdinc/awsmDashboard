@@ -33,7 +33,7 @@ func (e EditClass) Render() gr.Component {
 		gr.Text("Loading...").Modify(response)
 
 	} else if errStr := state.String("error"); errStr != "" {
-		gr.Text(errStr).Modify(response)
+		helpers.ErrorElem(errStr).Modify(response)
 	} else {
 
 		if state.Int("step") == 1 {

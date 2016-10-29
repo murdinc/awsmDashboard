@@ -23,6 +23,23 @@ func textField(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.
 	)
 }
 
+func textArea(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.Element {
+	return el.Div(
+		gr.CSS("form-group"),
+		el.Label(
+			gr.Text(name),
+		),
+		el.TextArea(
+			attr.ClassName("form-control"),
+			attr.ID(id),
+			attr.Placeholder(name),
+			evt.Change(storeFunc),
+			attr.Value(state.String(id)),
+			attr.Rows(5),
+		),
+	)
+}
+
 func checkbox(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.Element {
 
 	label := "disabled"

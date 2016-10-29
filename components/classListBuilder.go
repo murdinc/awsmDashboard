@@ -114,6 +114,15 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
+	case "autoscalegroups":
+		var cType config.AutoscaleGroupClass
+		for className, class := range classes {
+			cJson := class.Bytes()
+			json.Unmarshal(cJson, &cType)
+			keys, values := config.ExtractAwsmClass(cType)
+			buildClassButton(className, keys, values, classListGroup, onClick)
+		}
+
 	case "loadbalancers":
 		var cType config.LoadBalancerClass
 		for className, class := range classes {

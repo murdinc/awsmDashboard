@@ -17,46 +17,49 @@ func EditClassFormBuilder(classBytes []byte) (*gr.ReactComponent, *gabs.Containe
 	switch classType {
 
 	case "alarms":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.AlarmClassForm{}), jsonParsed
 
 	case "instances":
 		return gr.New(&forms.InstanceClassForm{}), jsonParsed
 
 	case "volumes":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.VolumeClassForm{}), jsonParsed
 
 	case "images":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
-
-	case "keypairs":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.ImageClassForm{}), jsonParsed
 
 	case "snapshots":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.SnapshotClassForm{}), jsonParsed
 
 	case "vpcs":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.VpcClassForm{}), jsonParsed
 
 	case "subnets":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.SubnetClassForm{}), jsonParsed
 
 	case "securitygroups":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
-
-	case "addresses":
-	//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.SecurityGroupClassForm{}), jsonParsed
 
 	case "launchconfigurations":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.LaunchConfigurationClassForm{}), jsonParsed
 
 	case "loadbalancers":
-		//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.LoadBalancerClassForm{}), jsonParsed
 
 	case "scalingpolicies":
-	//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+		return gr.New(&forms.ScalingPolicyClassForm{}), jsonParsed
 
-	case "simpledbdomains":
-	//return gr.New(&forms.InstanceClassForm{}), jsonParsed
+	case "autoscalegroups":
+		return gr.New(&forms.AutoscaleGroupClassForm{}), jsonParsed
+
+	//case "simpledbdomains":
+	//return gr.New(&forms.SimpleDBDomainClassForm{}), jsonParsed
+
+	//case "addresses":
+	//return gr.New(&forms.AddressClassForm{}), jsonParsed
+
+	//case "keypairs":
+	//return gr.New(&forms.KeyPairClassForm{}), jsonParsed
 
 	default:
 		println("Class Type not found in EditClassFormBuilder switch:")

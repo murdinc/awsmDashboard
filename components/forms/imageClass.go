@@ -11,33 +11,17 @@ import (
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
-var (
-	instanceTypes = []string{
-		"t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "m4.16xlarge", "m3.medium",
-		"m3.large", "m3.xlarge", "m3.2xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge",
-		"c3.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "x1.16xlarge", "x1.32xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge",
-		"i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "p2.xlarge", "p2.8xlarge", "p2.16xlarge", "g2.2xlarge", "g2.8xlarge",
-	}
-
-	shutdownBehaviors = []string{"stop", "terminate"}
-)
-
-type InstanceClassForm struct {
+type ImageClassForm struct {
 	*gr.This
 }
 
 // Implements the StateInitializer interface
-func (i InstanceClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "",
-		"monitoring":      false,
-		"publicIpAddress": false,
-		"ebsOptimized":    false,
-		"step":            1,
-	}
+func (i ImageClassForm) GetInitialState() gr.State {
+	return gr.State{"querying": true, "error": "", "success": "", "step": 1}
 }
 
 // Implements the ComponentDidMount interface
-func (i InstanceClassForm) ComponentWillMount() {
+func (i ImageClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 
 	if i.Props().Interface("class") != nil {
@@ -64,7 +48,7 @@ func (i InstanceClassForm) ComponentWillMount() {
 	}()
 }
 
-func (i InstanceClassForm) Render() gr.Component {
+func (i ImageClassForm) Render() gr.Component {
 
 	state := i.State()
 	props := i.Props()
@@ -115,7 +99,7 @@ func (i InstanceClassForm) Render() gr.Component {
 	return response
 }
 
-func (i InstanceClassForm) BuildClassForm(className string, optionsResp interface{}) *gr.Element {
+func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}) *gr.Element {
 
 	state := i.State()
 	props := i.Props()
@@ -132,19 +116,16 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 
 	classEditForm := el.Form()
 
-	selectOne("Instance Type", "instanceType", instanceTypes, &state, i.storeValue).Modify(classEditForm)
-	selectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], &state, i.storeValue).Modify(classEditForm)
-	selectMultiple("EBS Volumes", "ebsVolumes", classOptions["volumes"], &state, i.storeValue).Modify(classEditForm)
-	selectOne("Vpc", "vpc", classOptions["vpcs"], &state, i.storeValue).Modify(classEditForm)
-	selectOne("Subnet", "subnet", classOptions["subnets"], &state, i.storeValue).Modify(classEditForm)
-	checkbox("Public IP Address", "publicIpAddress", &state, i.storeValue).Modify(classEditForm)
-	selectOne("AMI", "ami", classOptions["images"], &state, i.storeValue).Modify(classEditForm)
-	selectOne("Key Name", "keyName", classOptions["keypairs"], &state, i.storeValue).Modify(classEditForm)
-	checkbox("EBS Optimized", "ebsOptimized", &state, i.storeValue).Modify(classEditForm)
-	checkbox("Monitoring", "monitoring", &state, i.storeValue).Modify(classEditForm)
-	selectOne("Shutdown Behavior", "shutdownBehavior", shutdownBehaviors, &state, i.storeValue).Modify(classEditForm)
-	selectOne("IAM User", "iamUser", classOptions["iamusers"], &state, i.storeValue).Modify(classEditForm)
-	textArea("User Data", "userData", &state, i.storeValue).Modify(classEditForm)
+	checkbox("Propagate", "propagate", &state, i.storeValue).Modify(classEditForm)
+	if state.Bool("propagate") {
+		selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], &state, i.storeValue).Modify(classEditForm)
+	}
+	checkbox("Rotate", "rotate", &state, i.storeValue).Modify(classEditForm)
+	if state.Bool("rotate") {
+		textField("Retain", "retain", &state, i.storeValue).Modify(classEditForm) // number
+	}
+
+	textField("Instance ID", "instanceID", &state, i.storeValue).Modify(classEditForm) // select one?
 
 	classEditForm.Modify(classEdit)
 
@@ -181,17 +162,17 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 
 }
 
-func (i InstanceClassForm) backButton(*gr.Event) {
+func (i ImageClassForm) backButton(*gr.Event) {
 	i.SetState(gr.State{"success": ""})
 	i.Props().Call("backButton")
 }
 
-func (i InstanceClassForm) doneButton(*gr.Event) {
+func (i ImageClassForm) doneButton(*gr.Event) {
 	i.SetState(gr.State{"success": ""})
 	i.Props().Call("hideAllModals")
 }
 
-func (i InstanceClassForm) saveButton(*gr.Event) {
+func (i ImageClassForm) saveButton(*gr.Event) {
 	i.SetState(gr.State{"querying": true, "step": 2})
 
 	cfg := make(map[string]interface{})
@@ -217,7 +198,7 @@ func (i InstanceClassForm) saveButton(*gr.Event) {
 
 }
 
-func (i InstanceClassForm) deleteButton(*gr.Event) {
+func (i ImageClassForm) deleteButton(*gr.Event) {
 	i.SetState(gr.State{"querying": true})
 
 	go func() {
@@ -237,7 +218,7 @@ func (i InstanceClassForm) deleteButton(*gr.Event) {
 	}()
 }
 
-func (i InstanceClassForm) storeValue(event *gr.Event) {
+func (i ImageClassForm) storeValue(event *gr.Event) {
 	id := event.Target().Get("id").String()
 	inputType := event.Target().Get("type").String()
 

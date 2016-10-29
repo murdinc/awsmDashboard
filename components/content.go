@@ -12,13 +12,23 @@ type Content struct {
 
 func (c Content) Render() gr.Component {
 
-	return el.Div(gr.CSS("content-wrapper"),
-		el.Div(gr.CSS("content-header"),
-			el.Header1(
-				gr.Text(c.Props().String("activePage")+" "),
-			),
-			gr.New(&AssetDropdownMenu{}).CreateElement(gr.Props{"type": c.Page.Type, "apiType": c.Page.ApiType}),
-		),
-		gr.New(&AssetTable{}).CreateElement(gr.Props{"apiType": c.Page.ApiType}),
+	resp := el.Div(
+		gr.CSS("content-wrapper"),
 	)
+
+	// Header
+	header := el.Div(gr.CSS("content-header"),
+		el.Header1(
+			gr.Text(c.Props().String("activePage")+" "),
+		),
+	)
+	if c.Page.HasClasses {
+		gr.New(&AssetDropdownMenu{}).CreateElement(gr.Props{"type": c.Page.Type, "apiType": c.Page.ApiType}).Modify(header)
+	}
+	header.Modify(resp)
+
+	// Asset Table
+	gr.New(&AssetTable{}).CreateElement(gr.Props{"apiType": c.Page.ApiType}).Modify(resp)
+
+	return resp
 }
