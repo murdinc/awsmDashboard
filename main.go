@@ -14,7 +14,7 @@ var (
 	pages = components.Pages{
 		"Dashboard": components.Page{
 			Route:      "/",
-			ApiType:    "images",
+			ApiType:    "keypairs",
 			Type:       "Dashboard",
 			HasClasses: true,
 		},
@@ -72,11 +72,11 @@ var (
 			Type:       "Alarm",
 			HasClasses: true,
 		},
-		"KeyPairs": components.Page{
+		"Key Pairs": components.Page{
 			Route:      "/keypairs",
 			ApiType:    "keypairs",
-			Type:       "KeyPair",
-			HasClasses: false,
+			Type:       "Key Pair",
+			HasClasses: true,
 		},
 		"Launch Configurations": components.Page{
 			Route:      "/launchconfigurations",

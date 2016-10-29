@@ -63,8 +63,14 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 			buildClassButton(className, keys, values, classListGroup, onClick)
 		}
 
-	//case "keypairs":
-	// TODO ?
+	case "keypairs":
+		var cType config.KeyPairClass
+		for className, class := range classes {
+			cJson := class.Bytes()
+			json.Unmarshal(cJson, &cType)
+			keys, values := config.ExtractAwsmClass(cType)
+			buildClassButton(className, keys, values, classListGroup, onClick)
+		}
 
 	case "snapshots":
 		var cType config.SnapshotClass
