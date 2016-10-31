@@ -121,7 +121,7 @@ func (v VpcClassForm) BuildClassForm(className string, optionsResp interface{}) 
 	classEditForm := el.Form()
 
 	textField("CIDR", "cidr", &state, v.storeValue).Modify(classEditForm)
-	selectOne("Tenancy", "tenancy", tenancy, &state, v.storeValue).Modify(classEditForm)
+	selectOne("Tenancy", "tenancy", tenancy, &state, v.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 
@@ -223,22 +223,33 @@ func (v VpcClassForm) storeValue(event *gr.Event) {
 	case "checkbox":
 		v.SetState(gr.State{id: event.Target().Get("checked").Bool()})
 
-	case "select-one":
-		v.SetState(gr.State{id: event.TargetValue()})
-
-	case "select-multiple":
-		var vals []string
-		options := event.Target().Length()
-
-		for i := 0; i < options; i++ {
-			if event.Target().Index(i).Get("selected").Bool() && event.Target().Index(i).Get("id") != nil {
-				vals = append(vals, event.Target().Index(i).Get("id").String())
-			}
-		}
-		v.SetState(gr.State{id: vals})
+	case "number":
+		v.SetState(gr.State{id: event.TargetValue().Int()})
 
 	default: // text, at least
 		v.SetState(gr.State{id: event.TargetValue()})
+
+	}
+}
+
+func (v VpcClassForm) storeSelect(id string, val interface{}) {
+	switch value := val.(type) {
+
+	case map[string]interface{}:
+		// single
+		v.SetState(gr.State{id: value["value"]})
+
+	case []interface{}:
+		// multi
+		var vals []string
+		options := len(value)
+		for i := 0; i < options; i++ {
+			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+		}
+		v.SetState(gr.State{id: vals})
+
+	default:
+		v.SetState(gr.State{id: val})
 
 	}
 }

@@ -14,10 +14,28 @@ func textField(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.
 			gr.Text(name),
 		),
 		el.Input(
+			attr.Type("text"),
 			attr.ClassName("form-control"),
 			attr.ID(id),
 			attr.Placeholder(name),
 			attr.Value(state.String(id)),
+			evt.Change(storeFunc),
+		),
+	)
+}
+
+func numberField(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.Element {
+	return el.Div(
+		gr.CSS("form-group"),
+		el.Label(
+			gr.Text(name),
+		),
+		el.Input(
+			attr.Type("number"),
+			attr.ClassName("form-control"),
+			attr.ID(id),
+			attr.Placeholder(name),
+			attr.Value(state.Int(id)),
 			evt.Change(storeFunc),
 		),
 	)
@@ -43,10 +61,10 @@ func textArea(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.E
 func checkbox(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.Element {
 
 	label := "disabled"
-	checked := attr.Target(gr.CSS(""))
+	var checked gr.Modifier
 	if state.Bool(id) {
 		label = "enabled"
-		checked = attr.Checked(gr.CSS(""))
+		checked = attr.Checked(true)
 	}
 
 	return el.Div(
@@ -62,7 +80,7 @@ func checkbox(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.E
 					attr.Type("checkbox"),
 					attr.ID(id),
 					checked,
-					evt.Change(storeFunc),
+					evt.Change(storeFunc).StopPropagation(),
 				),
 				gr.Text(label),
 			),
@@ -70,68 +88,76 @@ func checkbox(name, id string, state *gr.State, storeFunc func(*gr.Event)) *gr.E
 	)
 }
 
-func selectOne(name, id string, options []string, state *gr.State, storeFunc func(*gr.Event)) *gr.Element {
-
-	selectOpts := el.Select(
-		attr.ClassName("form-control"),
-		attr.ID(id),
-		evt.Change(storeFunc),
-		attr.Value(state.String(id)),
-		el.Option(
-			//attr.ID("nil"),
-			//attr.Value("nil"),
-			//attr.Disabled("true"),
-			gr.Text("Select "+name),
-		),
-	)
-
-	for _, option := range options {
-		opt := el.Option(
-			attr.ID(option),
-			attr.Value(option),
-			gr.Text(option),
-		)
-
-		opt.Modify(selectOpts)
+func selectOne(name, id string, options []string, state *gr.State, storeSelect func(string, interface{})) *gr.Element {
+	opts := make([]interface{}, len(options))
+	for i, option := range options {
+		opts[i] = map[string]string{
+			"value": option,
+			"label": option,
+		}
 	}
+
+	var value interface{}
+	if selected, ok := state.Interface(id).(interface{}); ok {
+		value = selected
+	}
+
+	onChange := func(vals interface{}) {
+		storeSelect(id, vals)
+	}
+
+	reactSelect := gr.FromGlobal("Select")
+	reactSelectElem := reactSelect.CreateElement(gr.Props{
+		"name":               name,
+		"value":              value,
+		"options":            opts,
+		"onChange":           onChange,
+		"clearable":          false,
+		"scrollMenuIntoView": false,
+	})
 
 	return el.Div(
 		gr.CSS("form-group"),
 		el.Label(
 			gr.Text(name),
 		),
-		selectOpts,
+		reactSelectElem,
 	)
 }
 
-func selectMultiple(name, id string, options []string, state *gr.State, storeFunc func(*gr.Event)) *gr.Element {
+func selectMultiple(name, id string, options []string, state *gr.State, storeSelect func(string, interface{})) *gr.Element {
+	opts := make([]interface{}, len(options))
+	for i, option := range options {
+		opts[i] = map[string]string{
+			"value": option,
+			"label": option,
+		}
+	}
 
-	selectOpts := el.Select(
-		attr.Multiple(attr.ClassName("")),
-		attr.ClassName("form-control"),
-		attr.ID(id),
-		evt.Change(storeFunc),
-	)
-
+	var value []interface{}
 	if selected, ok := state.Interface(id).([]interface{}); ok {
-		attr.Value(selected).Modify(selectOpts)
+		value = selected
 	}
 
-	for _, option := range options {
-		opt := el.Option(
-			attr.ID(option),
-			attr.Value(option),
-			gr.Text(option),
-		)
-
-		opt.Modify(selectOpts)
+	onChange := func(vals interface{}) {
+		storeSelect(id, vals)
 	}
+
+	reactSelect := gr.FromGlobal("Select")
+	reactSelectElem := reactSelect.CreateElement(gr.Props{
+		"name":               name,
+		"value":              value,
+		"options":            opts,
+		"onChange":           onChange,
+		"multi":              true,
+		"scrollMenuIntoView": false,
+	})
 
 	return el.Div(
 		gr.CSS("form-group"),
 		el.Label(
 			gr.Text(name),
 		),
-		selectOpts,
+		reactSelectElem,
 	)
 }

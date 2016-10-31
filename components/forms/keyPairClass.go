@@ -221,22 +221,33 @@ func (k KeyPairClassForm) storeValue(event *gr.Event) {
 	case "checkbox":
 		k.SetState(gr.State{id: event.Target().Get("checked").Bool()})
 
-	case "select-one":
-		k.SetState(gr.State{id: event.TargetValue()})
-
-	case "select-multiple":
-		var vals []string
-		options := event.Target().Length()
-
-		for i := 0; i < options; i++ {
-			if event.Target().Index(i).Get("selected").Bool() && event.Target().Index(i).Get("id") != nil {
-				vals = append(vals, event.Target().Index(i).Get("id").String())
-			}
-		}
-		k.SetState(gr.State{id: vals})
+	case "number":
+		k.SetState(gr.State{id: event.TargetValue().Int()})
 
 	default: // text, at least
 		k.SetState(gr.State{id: event.TargetValue()})
+
+	}
+}
+
+func (k KeyPairClassForm) storeSelect(id string, val interface{}) {
+	switch value := val.(type) {
+
+	case map[string]interface{}:
+		// single
+		k.SetState(gr.State{id: value["value"]})
+
+	case []interface{}:
+		// multi
+		var vals []string
+		options := len(value)
+		for i := 0; i < options; i++ {
+			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+		}
+		k.SetState(gr.State{id: vals})
+
+	default:
+		k.SetState(gr.State{id: val})
 
 	}
 }

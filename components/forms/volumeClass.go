@@ -121,13 +121,13 @@ func (v VolumeClassForm) BuildClassForm(className string, optionsResp interface{
 	classEditForm := el.Form()
 
 	textField("Device Name", "deviceName", &state, v.storeValue).Modify(classEditForm)
-	textField("Volume Size", "volumeSize", &state, v.storeValue).Modify(classEditForm) // number
+	numberField("Volume Size", "volumeSize", &state, v.storeValue).Modify(classEditForm)
 	checkbox("Delete On Termination", "deleteOnTermination", &state, v.storeValue).Modify(classEditForm)
-	textField("Mount Mount", "mountPoint", &state, v.storeValue).Modify(classEditForm)
-	selectOne("Snapshot", "snapshot", classOptions["snapshots"], &state, v.storeValue).Modify(classEditForm)
-	selectOne("Volume Type", "volumeType", volumeTypes, &state, v.storeValue).Modify(classEditForm)
+	textField("Mount Point", "mountPoint", &state, v.storeValue).Modify(classEditForm)
+	selectOne("Snapshot", "snapshot", classOptions["snapshots"], &state, v.storeSelect).Modify(classEditForm)
+	selectOne("Volume Type", "volumeType", volumeTypes, &state, v.storeSelect).Modify(classEditForm)
 	if state.String("volumeType") == "io1" {
-		textField("IOPS", "iops", &state, v.storeValue).Modify(classEditForm) // number
+		numberField("IOPS", "iops", &state, v.storeValue).Modify(classEditForm)
 	}
 	checkbox("Encrypted", "encrypted", &state, v.storeValue).Modify(classEditForm)
 
@@ -231,22 +231,33 @@ func (v VolumeClassForm) storeValue(event *gr.Event) {
 	case "checkbox":
 		v.SetState(gr.State{id: event.Target().Get("checked").Bool()})
 
-	case "select-one":
-		v.SetState(gr.State{id: event.TargetValue()})
-
-	case "select-multiple":
-		var vals []string
-		options := event.Target().Length()
-
-		for i := 0; i < options; i++ {
-			if event.Target().Index(i).Get("selected").Bool() && event.Target().Index(i).Get("id") != nil {
-				vals = append(vals, event.Target().Index(i).Get("id").String())
-			}
-		}
-		v.SetState(gr.State{id: vals})
+	case "number":
+		v.SetState(gr.State{id: event.TargetValue().Int()})
 
 	default: // text, at least
 		v.SetState(gr.State{id: event.TargetValue()})
+
+	}
+}
+
+func (v VolumeClassForm) storeSelect(id string, val interface{}) {
+	switch value := val.(type) {
+
+	case map[string]interface{}:
+		// single
+		v.SetState(gr.State{id: value["value"]})
+
+	case []interface{}:
+		// multi
+		var vals []string
+		options := len(value)
+		for i := 0; i < options; i++ {
+			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+		}
+		v.SetState(gr.State{id: vals})
+
+	default:
+		v.SetState(gr.State{id: val})
 
 	}
 }

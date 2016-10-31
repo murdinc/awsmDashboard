@@ -132,18 +132,18 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 
 	classEditForm := el.Form()
 
-	selectOne("Instance Type", "instanceType", instanceTypes, &state, i.storeValue).Modify(classEditForm)
-	selectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], &state, i.storeValue).Modify(classEditForm)
-	selectMultiple("EBS Volumes", "ebsVolumes", classOptions["volumes"], &state, i.storeValue).Modify(classEditForm)
-	selectOne("Vpc", "vpc", classOptions["vpcs"], &state, i.storeValue).Modify(classEditForm)
-	selectOne("Subnet", "subnet", classOptions["subnets"], &state, i.storeValue).Modify(classEditForm)
+	selectOne("Instance Type", "instanceType", instanceTypes, &state, i.storeSelect).Modify(classEditForm)
+	selectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], &state, i.storeSelect).Modify(classEditForm)
+	selectMultiple("EBS Volumes", "ebsVolumes", classOptions["volumes"], &state, i.storeSelect).Modify(classEditForm)
+	selectOne("Vpc", "vpc", classOptions["vpcs"], &state, i.storeSelect).Modify(classEditForm)
+	selectOne("Subnet", "subnet", classOptions["subnets"], &state, i.storeSelect).Modify(classEditForm)
 	checkbox("Public IP Address", "publicIpAddress", &state, i.storeValue).Modify(classEditForm)
-	selectOne("AMI", "ami", classOptions["images"], &state, i.storeValue).Modify(classEditForm)
-	selectOne("Key Name", "keyName", classOptions["keypairs"], &state, i.storeValue).Modify(classEditForm)
+	selectOne("AMI", "ami", classOptions["images"], &state, i.storeSelect).Modify(classEditForm)
+	selectOne("Key Name", "keyName", classOptions["keypairs"], &state, i.storeSelect).Modify(classEditForm)
 	checkbox("EBS Optimized", "ebsOptimized", &state, i.storeValue).Modify(classEditForm)
 	checkbox("Monitoring", "monitoring", &state, i.storeValue).Modify(classEditForm)
-	selectOne("Shutdown Behavior", "shutdownBehavior", shutdownBehaviors, &state, i.storeValue).Modify(classEditForm)
-	selectOne("IAM User", "iamUser", classOptions["iamusers"], &state, i.storeValue).Modify(classEditForm)
+	selectOne("Shutdown Behavior", "shutdownBehavior", shutdownBehaviors, &state, i.storeSelect).Modify(classEditForm)
+	selectOne("IAM User", "iamUser", classOptions["iamusers"], &state, i.storeSelect).Modify(classEditForm)
 	textArea("User Data", "userData", &state, i.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
@@ -246,22 +246,33 @@ func (i InstanceClassForm) storeValue(event *gr.Event) {
 	case "checkbox":
 		i.SetState(gr.State{id: event.Target().Get("checked").Bool()})
 
-	case "select-one":
-		i.SetState(gr.State{id: event.TargetValue()})
-
-	case "select-multiple":
-		var vals []string
-		options := event.Target().Length()
-
-		for i := 0; i < options; i++ {
-			if event.Target().Index(i).Get("selected").Bool() && event.Target().Index(i).Get("id") != nil {
-				vals = append(vals, event.Target().Index(i).Get("id").String())
-			}
-		}
-		i.SetState(gr.State{id: vals})
+	case "number":
+		i.SetState(gr.State{id: event.TargetValue().Int()})
 
 	default: // text, at least
 		i.SetState(gr.State{id: event.TargetValue()})
+
+	}
+}
+
+func (i InstanceClassForm) storeSelect(id string, val interface{}) {
+	switch value := val.(type) {
+
+	case map[string]interface{}:
+		// single
+		i.SetState(gr.State{id: value["value"]})
+
+	case []interface{}:
+		// multi
+		var vals []string
+		options := len(value)
+		for i := 0; i < options; i++ {
+			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+		}
+		i.SetState(gr.State{id: vals})
+
+	default:
+		i.SetState(gr.State{id: val})
 
 	}
 }

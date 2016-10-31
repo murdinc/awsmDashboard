@@ -126,29 +126,29 @@ func (a AutoscaleGroupClassForm) BuildClassForm(className string, optionsResp in
 
 	classEditForm := el.Form()
 
-	selectOne("Launch Configuration Class", "launchConfigurationClass", classOptions["launchconfigurations"], &state, a.storeValue).Modify(classEditForm)
+	selectOne("Launch Configuration Class", "launchConfigurationClass", classOptions["launchconfigurations"], &state, a.storeSelect).Modify(classEditForm)
 
 	//checkbox("Rotate", "rotate", &state, a.storeValue).Modify(classEditForm)
 	//if state.Bool("rotate") {
-	textField("Retain", "retain", &state, a.storeValue).Modify(classEditForm) // number
+	numberField("Retain", "retain", &state, a.storeValue).Modify(classEditForm)
 	//}
 	checkbox("Propagate", "propagate", &state, a.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
 		//selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], &state, a.storeValue).Modify(classEditForm)
 	}
 
-	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], &state, a.storeValue).Modify(classEditForm)
-	textField("Desired Capacity", "desiredCapacity", &state, a.storeValue).Modify(classEditForm) // number
-	textField("Min Size", "minSize", &state, a.storeValue).Modify(classEditForm)                 // number
-	textField("Max Size", "maxSize", &state, a.storeValue).Modify(classEditForm)                 // number
-	textField("Default Cooldown", "defaultCooldown", &state, a.storeValue).Modify(classEditForm) // number
-	selectOne("Subnet Class", "subnetClass", classOptions["subnets"], &state, a.storeValue).Modify(classEditForm)
-	selectOne("Health Check Type", "healthCheckType", healthCheckTypes, &state, a.storeValue).Modify(classEditForm)
-	textField("Health Check Grace Period", "healthCheckGracePeriod", &state, a.storeValue).Modify(classEditForm) // number
-	selectMultiple("Termination Policies", "terminationPolicies", terminationPolicies, &state, a.storeValue).Modify(classEditForm)
-	selectMultiple("Scaling Policies", "scalingPolicies", classOptions["scalingpolicies"], &state, a.storeValue).Modify(classEditForm)
-	selectMultiple("Load Balancer Names", "loadBalancerNames", classOptions["loadbalancers"], &state, a.storeValue).Modify(classEditForm)
-	selectMultiple("Alarms", "alarms", classOptions["alarms"], &state, a.storeValue).Modify(classEditForm)
+	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], &state, a.storeSelect).Modify(classEditForm)
+	numberField("Desired Capacity", "desiredCapacity", &state, a.storeValue).Modify(classEditForm)
+	numberField("Min Size", "minSize", &state, a.storeValue).Modify(classEditForm)
+	numberField("Max Size", "maxSize", &state, a.storeValue).Modify(classEditForm)
+	numberField("Default Cooldown", "defaultCooldown", &state, a.storeValue).Modify(classEditForm)
+	selectOne("Subnet Class", "subnetClass", classOptions["subnets"], &state, a.storeSelect).Modify(classEditForm)
+	selectOne("Health Check Type", "healthCheckType", healthCheckTypes, &state, a.storeSelect).Modify(classEditForm)
+	numberField("Health Check Grace Period", "healthCheckGracePeriod", &state, a.storeValue).Modify(classEditForm)
+	selectMultiple("Termination Policies", "terminationPolicies", terminationPolicies, &state, a.storeSelect).Modify(classEditForm)
+	selectMultiple("Scaling Policies", "scalingPolicies", classOptions["scalingpolicies"], &state, a.storeSelect).Modify(classEditForm)
+	selectMultiple("Load Balancer Names", "loadBalancerNames", classOptions["loadbalancers"], &state, a.storeSelect).Modify(classEditForm)
+	selectMultiple("Alarms", "alarms", classOptions["alarms"], &state, a.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 
@@ -250,22 +250,33 @@ func (a AutoscaleGroupClassForm) storeValue(event *gr.Event) {
 	case "checkbox":
 		a.SetState(gr.State{id: event.Target().Get("checked").Bool()})
 
-	case "select-one":
-		a.SetState(gr.State{id: event.TargetValue()})
-
-	case "select-multiple":
-		var vals []string
-		options := event.Target().Length()
-
-		for i := 0; i < options; i++ {
-			if event.Target().Index(i).Get("selected").Bool() && event.Target().Index(i).Get("id") != nil {
-				vals = append(vals, event.Target().Index(i).Get("id").String())
-			}
-		}
-		a.SetState(gr.State{id: vals})
+	case "number":
+		a.SetState(gr.State{id: event.TargetValue().Int()})
 
 	default: // text, at least
 		a.SetState(gr.State{id: event.TargetValue()})
+
+	}
+}
+
+func (a AutoscaleGroupClassForm) storeSelect(id string, val interface{}) {
+	switch value := val.(type) {
+
+	case map[string]interface{}:
+		// single
+		a.SetState(gr.State{id: value["value"]})
+
+	case []interface{}:
+		// multi
+		var vals []string
+		options := len(value)
+		for i := 0; i < options; i++ {
+			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+		}
+		a.SetState(gr.State{id: vals})
+
+	default:
+		a.SetState(gr.State{id: val})
 
 	}
 }

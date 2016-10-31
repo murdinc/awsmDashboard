@@ -130,18 +130,18 @@ func (a AlarmClassForm) BuildClassForm(className string, optionsResp interface{}
 	classEditForm := el.Form()
 
 	textField("Alarm Description", "alarmDescription", &state, a.storeValue).Modify(classEditForm)
-	selectMultiple("Alarm Actions", "alarmActions", classOptions["scalingpolicies"], &state, a.storeValue).Modify(classEditForm)
-	selectMultiple("OK Actions", "okActions", classOptions["scalingpolicies"], &state, a.storeValue).Modify(classEditForm)
-	selectMultiple("Insufficient Data Actions", "insufficientDataActions", classOptions["scalingpolicies"], &state, a.storeValue).Modify(classEditForm)
-	selectOne("Metric Name", "metricName", classOptions["metricName"], &state, a.storeValue).Modify(classEditForm)
-	selectOne("Namespace", "namespace", alarmNamespaces, &state, a.storeValue).Modify(classEditForm)
-	selectOne("Statistic", "statistic", classOptions["statistic"], &state, a.storeValue).Modify(classEditForm)
-	textField("Period", "period", &state, a.storeValue).Modify(classEditForm)                        // number
-	textField("Evaluation Periods", "evaluationPeriods", &state, a.storeValue).Modify(classEditForm) // number
-	textField("Threshold", "threshold", &state, a.storeValue).Modify(classEditForm)                  // number
-	selectOne("Comparison Operator", "comparisonOperator", alarmComparisonOperators, &state, a.storeValue).Modify(classEditForm)
+	selectMultiple("Alarm Actions", "alarmActions", classOptions["scalingpolicies"], &state, a.storeSelect).Modify(classEditForm)
+	selectMultiple("OK Actions", "okActions", classOptions["scalingpolicies"], &state, a.storeSelect).Modify(classEditForm)
+	selectMultiple("Insufficient Data Actions", "insufficientDataActions", classOptions["scalingpolicies"], &state, a.storeSelect).Modify(classEditForm)
+	selectOne("Metric Name", "metricName", classOptions["metricName"], &state, a.storeSelect).Modify(classEditForm)
+	selectOne("Namespace", "namespace", alarmNamespaces, &state, a.storeSelect).Modify(classEditForm)
+	selectOne("Statistic", "statistic", classOptions["statistic"], &state, a.storeSelect).Modify(classEditForm)
+	numberField("Period", "period", &state, a.storeValue).Modify(classEditForm)
+	numberField("Evaluation Periods", "evaluationPeriods", &state, a.storeValue).Modify(classEditForm)
+	numberField("Threshold", "threshold", &state, a.storeValue).Modify(classEditForm)
+	selectOne("Comparison Operator", "comparisonOperator", alarmComparisonOperators, &state, a.storeSelect).Modify(classEditForm)
 	checkbox("Actions Enabled", "actionsEnabled", &state, a.storeValue).Modify(classEditForm)
-	selectOne("Unit", "unit", classOptions["unit"], &state, a.storeValue).Modify(classEditForm)
+	selectOne("Unit", "unit", classOptions["unit"], &state, a.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 
@@ -243,22 +243,33 @@ func (a AlarmClassForm) storeValue(event *gr.Event) {
 	case "checkbox":
 		a.SetState(gr.State{id: event.Target().Get("checked").Bool()})
 
-	case "select-one":
-		a.SetState(gr.State{id: event.TargetValue()})
-
-	case "select-multiple":
-		var vals []string
-		options := event.Target().Length()
-
-		for i := 0; i < options; i++ {
-			if event.Target().Index(i).Get("selected").Bool() && event.Target().Index(i).Get("id") != nil {
-				vals = append(vals, event.Target().Index(i).Get("id").String())
-			}
-		}
-		a.SetState(gr.State{id: vals})
+	case "number":
+		a.SetState(gr.State{id: event.TargetValue().Int()})
 
 	default: // text, at least
 		a.SetState(gr.State{id: event.TargetValue()})
+
+	}
+}
+
+func (a AlarmClassForm) storeSelect(id string, val interface{}) {
+	switch value := val.(type) {
+
+	case map[string]interface{}:
+		// single
+		a.SetState(gr.State{id: value["value"]})
+
+	case []interface{}:
+		// multi
+		var vals []string
+		options := len(value)
+		for i := 0; i < options; i++ {
+			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+		}
+		a.SetState(gr.State{id: vals})
+
+	default:
+		a.SetState(gr.State{id: val})
 
 	}
 }

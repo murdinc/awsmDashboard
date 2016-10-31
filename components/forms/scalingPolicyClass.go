@@ -120,10 +120,10 @@ func (s ScalingPolicyClassForm) BuildClassForm(className string, optionsResp int
 
 	classEditForm := el.Form()
 
-	textField("Scaling Adjustment", "scalingAdjustment", &state, s.storeValue).Modify(classEditForm) // number
-	selectOne("Adjustment Type", "adjustmentType", adjustmentTypes, &state, s.storeValue).Modify(classEditForm)
-	textField("Cooldown", "cooldown", &state, s.storeValue).Modify(classEditForm) // number
-	selectMultiple("Alarms", "alarms", classOptions["keypairs"], &state, s.storeValue)
+	numberField("Scaling Adjustment", "scalingAdjustment", &state, s.storeValue).Modify(classEditForm)
+	selectOne("Adjustment Type", "adjustmentType", adjustmentTypes, &state, s.storeSelect).Modify(classEditForm)
+	numberField("Cooldown", "cooldown", &state, s.storeValue).Modify(classEditForm)
+	selectMultiple("Alarms", "alarms", classOptions["keypairs"], &state, s.storeSelect)
 
 	classEditForm.Modify(classEdit)
 
@@ -225,22 +225,33 @@ func (s ScalingPolicyClassForm) storeValue(event *gr.Event) {
 	case "checkbox":
 		s.SetState(gr.State{id: event.Target().Get("checked").Bool()})
 
-	case "select-one":
-		s.SetState(gr.State{id: event.TargetValue()})
-
-	case "select-multiple":
-		var vals []string
-		options := event.Target().Length()
-
-		for i := 0; i < options; i++ {
-			if event.Target().Index(i).Get("selected").Bool() && event.Target().Index(i).Get("id") != nil {
-				vals = append(vals, event.Target().Index(i).Get("id").String())
-			}
-		}
-		s.SetState(gr.State{id: vals})
+	case "number":
+		s.SetState(gr.State{id: event.TargetValue().Int()})
 
 	default: // text, at least
 		s.SetState(gr.State{id: event.TargetValue()})
+
+	}
+}
+
+func (s ScalingPolicyClassForm) storeSelect(id string, val interface{}) {
+	switch value := val.(type) {
+
+	case map[string]interface{}:
+		// single
+		s.SetState(gr.State{id: value["value"]})
+
+	case []interface{}:
+		// multi
+		var vals []string
+		options := len(value)
+		for i := 0; i < options; i++ {
+			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+		}
+		s.SetState(gr.State{id: vals})
+
+	default:
+		s.SetState(gr.State{id: val})
 
 	}
 }

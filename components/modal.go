@@ -7,17 +7,17 @@ import (
 	"github.com/gopherjs/jquery"
 )
 
+var jQuery = jquery.NewJQuery
+
 type Modal struct {
 	*gr.This
 }
 
 func hideAllModals() {
-	var jQuery = jquery.NewJQuery
 	jQuery(".modal").Call("modal", "hide")
 }
 
 func hideModal(id string) {
-	var jQuery = jquery.NewJQuery
 	jQuery("#"+id).Call("modal", "hide")
 }
 

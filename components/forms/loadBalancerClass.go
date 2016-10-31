@@ -120,10 +120,10 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 
 	classEditForm := el.Form()
 
-	selectOne("Scheme", "scheme", elbSchemes, &state, l.storeValue).Modify(classEditForm)
-	selectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], &state, l.storeValue).Modify(classEditForm)
-	selectMultiple("Subnets", "subnets", classOptions["subnets"], &state, l.storeValue).Modify(classEditForm)
-	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], &state, l.storeValue).Modify(classEditForm)
+	selectOne("Scheme", "scheme", elbSchemes, &state, l.storeSelect).Modify(classEditForm)
+	selectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], &state, l.storeSelect).Modify(classEditForm)
+	selectMultiple("Subnets", "subnets", classOptions["subnets"], &state, l.storeSelect).Modify(classEditForm)
+	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], &state, l.storeSelect).Modify(classEditForm)
 	// TODO Listeners
 
 	classEditForm.Modify(classEdit)
@@ -226,22 +226,33 @@ func (l LoadBalancerClassForm) storeValue(event *gr.Event) {
 	case "checkbox":
 		l.SetState(gr.State{id: event.Target().Get("checked").Bool()})
 
-	case "select-one":
-		l.SetState(gr.State{id: event.TargetValue()})
-
-	case "select-multiple":
-		var vals []string
-		options := event.Target().Length()
-
-		for i := 0; i < options; i++ {
-			if event.Target().Index(i).Get("selected").Bool() && event.Target().Index(i).Get("id") != nil {
-				vals = append(vals, event.Target().Index(i).Get("id").String())
-			}
-		}
-		l.SetState(gr.State{id: vals})
+	case "number":
+		l.SetState(gr.State{id: event.TargetValue().Int()})
 
 	default: // text, at least
 		l.SetState(gr.State{id: event.TargetValue()})
+
+	}
+}
+
+func (l LoadBalancerClassForm) storeSelect(id string, val interface{}) {
+	switch value := val.(type) {
+
+	case map[string]interface{}:
+		// single
+		l.SetState(gr.State{id: value["value"]})
+
+	case []interface{}:
+		// multi
+		var vals []string
+		options := len(value)
+		for i := 0; i < options; i++ {
+			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+		}
+		l.SetState(gr.State{id: vals})
+
+	default:
+		l.SetState(gr.State{id: val})
 
 	}
 }
