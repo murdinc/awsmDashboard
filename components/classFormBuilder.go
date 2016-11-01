@@ -109,6 +109,9 @@ func NewClassFormBuilder(classType string) *gr.ReactComponent {
 	case "scalingpolicies":
 		return gr.New(&forms.ScalingPolicyClassForm{})
 
+	case "autoscalegroups":
+		return gr.New(&forms.AutoscaleGroupClassForm{})
+
 	//case "simpledbdomains":
 	// TODO ?
 

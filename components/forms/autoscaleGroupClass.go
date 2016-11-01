@@ -27,6 +27,7 @@ func (a AutoscaleGroupClassForm) GetInitialState() gr.State {
 		"publicIpAddress": false,
 		"ebsOptimized":    false,
 		"step":            1,
+		"propagate":       false,
 	}
 }
 

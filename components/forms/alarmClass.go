@@ -30,7 +30,9 @@ type AlarmClassForm struct {
 
 // Implements the StateInitializer interface
 func (a AlarmClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "", "step": 1}
+	return gr.State{"querying": true, "error": "", "success": "", "step": 1,
+		"actionsEnabled": true,
+	}
 }
 
 // Implements the ComponentDidMount interface

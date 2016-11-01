@@ -21,7 +21,9 @@ type VpcClassForm struct {
 
 // Implements the StateInitializer interface
 func (v VpcClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "", "step": 1}
+	return gr.State{"querying": true, "error": "", "success": "", "step": 1,
+		"tenancy": "default",
+	}
 }
 
 // Implements the ComponentDidMount interface

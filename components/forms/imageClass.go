@@ -17,7 +17,10 @@ type ImageClassForm struct {
 
 // Implements the StateInitializer interface
 func (i ImageClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "", "step": 1}
+	return gr.State{"querying": true, "error": "", "success": "", "step": 1,
+		"propagate": false,
+		"rotate":    false,
+	}
 }
 
 // Implements the ComponentDidMount interface

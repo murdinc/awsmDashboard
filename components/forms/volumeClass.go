@@ -21,7 +21,10 @@ type VolumeClassForm struct {
 
 // Implements the StateInitializer interface
 func (v VolumeClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "", "step": 1}
+	return gr.State{"querying": true, "error": "", "success": "", "step": 1,
+		"deleteOnTermination": false,
+		"encrypted":           false,
+	}
 }
 
 // Implements the ComponentDidMount interface

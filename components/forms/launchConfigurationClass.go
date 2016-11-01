@@ -17,7 +17,9 @@ type LaunchConfigurationClassForm struct {
 
 // Implements the StateInitializer interface
 func (l LaunchConfigurationClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "", "step": 1}
+	return gr.State{"querying": true, "error": "", "success": "", "step": 1,
+		"rotate": false,
+	}
 }
 
 // Implements the ComponentDidMount interface
