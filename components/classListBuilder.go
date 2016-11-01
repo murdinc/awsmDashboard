@@ -16,7 +16,11 @@ func ClassListBuilder(cl interface{}, onClick func(string)) *gr.Element {
 	classList := cl.([]byte)
 
 	jsonParsed, _ := gabs.ParseJSON(classList)
-	classType := jsonParsed.S("classType").Data().(string)
+
+	classType, ok := jsonParsed.S("classType").Data().(string)
+	if !ok {
+		return &gr.Element{}
+	}
 	classes, _ := jsonParsed.S("classes").ChildrenMap()
 
 	classListGroup := el.Div(

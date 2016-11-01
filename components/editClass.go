@@ -3,8 +3,10 @@ package components
 import (
 	"fmt"
 
+	"github.com/Jeffail/gabs"
 	"github.com/bep/gr"
 	"github.com/bep/gr/el"
+	"github.com/bep/gr/evt"
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
@@ -19,6 +21,11 @@ func (e EditClass) GetInitialState() gr.State {
 
 func (e EditClass) ComponentWillMount() {
 	e.getClassList()
+}
+
+func (e EditClass) doneButton(*gr.Event) {
+	e.SetState(gr.State{"success": ""})
+	hideAllModals()
 }
 
 func (e EditClass) Render() gr.Component {
@@ -44,7 +51,22 @@ func (e EditClass) Render() gr.Component {
 				classList := ClassListBuilder(classes, e.selectClass) // Build the class list
 				classList.Modify(response)
 			} else {
-				gr.Text("Nothing here!").Modify(response)
+
+				helpers.ErrorElem("No existing " + props.String("apiType") + " classes found!").Modify(response)
+
+				buttons := el.Div(
+					gr.CSS("btn-toolbar"),
+				)
+
+				// Done
+				el.Button(
+					evt.Click(e.doneButton).PreventDefault(),
+					gr.CSS("btn", "btn-primary"),
+					gr.Text("Done"),
+				).Modify(buttons)
+
+				buttons.Modify(response)
+
 			}
 
 		} else if state.Int("step") == 2 {
@@ -80,6 +102,16 @@ func (e EditClass) getClassList() {
 				e.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
 				return
 			}
+
+			respParsed, _ := gabs.ParseJSON(resp)
+
+			success, ok := respParsed.S("success").Data().(bool)
+			if !ok || !success {
+				println("no existing " + e.Props().String("apiType") + " classes found")
+				e.SetState(gr.State{"querying": false})
+				return
+			}
+
 			e.SetState(gr.State{"querying": false, "classList": resp})
 		}
 	}()
