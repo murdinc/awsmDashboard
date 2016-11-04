@@ -137,14 +137,14 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 	selectMultiple("EBS Volumes", "ebsVolumes", classOptions["volumes"], &state, i.storeSelect).Modify(classEditForm)
 	selectOne("Vpc", "vpc", classOptions["vpcs"], &state, i.storeSelect).Modify(classEditForm)
 	selectOne("Subnet", "subnet", classOptions["subnets"], &state, i.storeSelect).Modify(classEditForm)
-	checkbox("Public IP Address", "publicIpAddress", &state, i.storeValue).Modify(classEditForm)
+	checkbox("Public IP Address", "publicIpAddress", state.Bool("publicIpAddress"), i.storeValue).Modify(classEditForm)
 	selectOne("AMI", "ami", classOptions["images"], &state, i.storeSelect).Modify(classEditForm)
 	selectOne("Key Name", "keyName", classOptions["keypairs"], &state, i.storeSelect).Modify(classEditForm)
-	checkbox("EBS Optimized", "ebsOptimized", &state, i.storeValue).Modify(classEditForm)
-	checkbox("Monitoring", "monitoring", &state, i.storeValue).Modify(classEditForm)
+	checkbox("EBS Optimized", "ebsOptimized", state.Bool("ebsOptimized"), i.storeValue).Modify(classEditForm)
+	checkbox("Monitoring", "monitoring", state.Bool("monitoring"), i.storeValue).Modify(classEditForm)
 	selectOne("Shutdown Behavior", "shutdownBehavior", shutdownBehaviors, &state, i.storeSelect).Modify(classEditForm)
 	selectOne("IAM User", "iamUser", classOptions["iamusers"], &state, i.storeSelect).Modify(classEditForm)
-	textArea("User Data", "userData", &state, i.storeValue).Modify(classEditForm)
+	textArea("User Data", "userData", state.String("userData"), i.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

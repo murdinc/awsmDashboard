@@ -131,18 +131,18 @@ func (a AlarmClassForm) BuildClassForm(className string, optionsResp interface{}
 
 	classEditForm := el.Form()
 
-	textField("Alarm Description", "alarmDescription", &state, a.storeValue).Modify(classEditForm)
+	textField("Alarm Description", "alarmDescription", state.String("alarmDescription"), a.storeValue).Modify(classEditForm)
 	selectMultiple("Alarm Actions", "alarmActions", classOptions["scalingpolicies"], &state, a.storeSelect).Modify(classEditForm)
 	selectMultiple("OK Actions", "okActions", classOptions["scalingpolicies"], &state, a.storeSelect).Modify(classEditForm)
 	selectMultiple("Insufficient Data Actions", "insufficientDataActions", classOptions["scalingpolicies"], &state, a.storeSelect).Modify(classEditForm)
 	selectOne("Metric Name", "metricName", classOptions["metricName"], &state, a.storeSelect).Modify(classEditForm)
 	selectOne("Namespace", "namespace", alarmNamespaces, &state, a.storeSelect).Modify(classEditForm)
 	selectOne("Statistic", "statistic", classOptions["statistic"], &state, a.storeSelect).Modify(classEditForm)
-	numberField("Period", "period", &state, a.storeValue).Modify(classEditForm)
-	numberField("Evaluation Periods", "evaluationPeriods", &state, a.storeValue).Modify(classEditForm)
-	numberField("Threshold", "threshold", &state, a.storeValue).Modify(classEditForm)
+	numberField("Period", "period", state.Int("period"), a.storeValue).Modify(classEditForm)
+	numberField("Evaluation Periods", "evaluationPeriods", state.Int("evaluationPeriods"), a.storeValue).Modify(classEditForm)
+	numberField("Threshold", "threshold", state.Int("threshold"), a.storeValue).Modify(classEditForm)
 	selectOne("Comparison Operator", "comparisonOperator", alarmComparisonOperators, &state, a.storeSelect).Modify(classEditForm)
-	checkbox("Actions Enabled", "actionsEnabled", &state, a.storeValue).Modify(classEditForm)
+	checkbox("Actions Enabled", "actionsEnabled", state.Bool("actionsEnabled"), a.storeValue).Modify(classEditForm)
 	selectOne("Unit", "unit", classOptions["unit"], &state, a.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)

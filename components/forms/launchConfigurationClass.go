@@ -118,11 +118,11 @@ func (l LaunchConfigurationClassForm) BuildClassForm(className string, optionsRe
 
 	classEditForm := el.Form()
 
-	numberField("Version", "version", &state, l.storeValue).Modify(classEditForm)
-	selectOne("Instance Class", "instanceClass", classOptions["metricName"], &state, l.storeSelect).Modify(classEditForm)
-	checkbox("Rotate", "rotate", &state, l.storeValue).Modify(classEditForm)
+	numberField("Version", "version", state.Int("version"), l.storeValue).Modify(classEditForm)
+	selectOne("Instance Class", "instanceClass", classOptions["instances"], &state, l.storeSelect).Modify(classEditForm)
+	checkbox("Rotate", "rotate", state.Bool("rotate"), l.storeValue).Modify(classEditForm)
 	if state.Bool("rotate") {
-		numberField("Retain", "retain", &state, l.storeValue).Modify(classEditForm)
+		numberField("Retain", "retain", state.Int("retain"), l.storeValue).Modify(classEditForm)
 	}
 	selectMultiple("Regions", "regions", classOptions["regions"], &state, l.storeSelect).Modify(classEditForm)
 

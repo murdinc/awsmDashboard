@@ -120,16 +120,16 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 
 	classEditForm := el.Form()
 
-	checkbox("Rotate", "rotate", &state, s.storeValue).Modify(classEditForm)
+	checkbox("Rotate", "rotate", state.Bool("rotate"), s.storeValue).Modify(classEditForm)
 	if state.Bool("rotate") {
-		numberField("Retain", "retain", &state, s.storeValue).Modify(classEditForm)
+		numberField("Retain", "retain", state.Int("retain"), s.storeValue).Modify(classEditForm)
 	}
-	checkbox("Propagate", "propagate", &state, s.storeValue).Modify(classEditForm)
+	checkbox("Propagate", "propagate", state.Bool("propagate"), s.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
 		selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], &state, s.storeSelect).Modify(classEditForm)
 	}
 
-	textField("Volume ID", "volumeID", &state, s.storeValue).Modify(classEditForm) // select one?
+	textField("Volume ID", "volumeID", state.String("volumeID"), s.storeValue).Modify(classEditForm) // select one?
 
 	classEditForm.Modify(classEdit)
 

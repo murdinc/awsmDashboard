@@ -122,7 +122,7 @@ func (v VpcClassForm) BuildClassForm(className string, optionsResp interface{}) 
 
 	classEditForm := el.Form()
 
-	textField("CIDR", "cidr", &state, v.storeValue).Modify(classEditForm)
+	textField("CIDR", "cidr", state.String("cidr"), v.storeValue).Modify(classEditForm)
 	selectOne("Tenancy", "tenancy", tenancy, &state, v.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)

@@ -123,16 +123,16 @@ func (v VolumeClassForm) BuildClassForm(className string, optionsResp interface{
 
 	classEditForm := el.Form()
 
-	textField("Device Name", "deviceName", &state, v.storeValue).Modify(classEditForm)
-	numberField("Volume Size", "volumeSize", &state, v.storeValue).Modify(classEditForm)
-	checkbox("Delete On Termination", "deleteOnTermination", &state, v.storeValue).Modify(classEditForm)
-	textField("Mount Point", "mountPoint", &state, v.storeValue).Modify(classEditForm)
+	textField("Device Name", "deviceName", state.String("deviceName"), v.storeValue).Modify(classEditForm)
+	numberField("Volume Size", "volumeSize", state.Int("volumeSize"), v.storeValue).Modify(classEditForm)
+	checkbox("Delete On Termination", "deleteOnTermination", state.Bool("deleteOnTermination"), v.storeValue).Modify(classEditForm)
+	textField("Mount Point", "mountPoint", state.String("mountPoint"), v.storeValue).Modify(classEditForm)
 	selectOne("Snapshot", "snapshot", classOptions["snapshots"], &state, v.storeSelect).Modify(classEditForm)
 	selectOne("Volume Type", "volumeType", volumeTypes, &state, v.storeSelect).Modify(classEditForm)
 	if state.String("volumeType") == "io1" {
-		numberField("IOPS", "iops", &state, v.storeValue).Modify(classEditForm)
+		numberField("IOPS", "iops", state.Int("iops"), v.storeValue).Modify(classEditForm)
 	}
-	checkbox("Encrypted", "encrypted", &state, v.storeValue).Modify(classEditForm)
+	checkbox("Encrypted", "encrypted", state.Bool("encrypted"), v.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

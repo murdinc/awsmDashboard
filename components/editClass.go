@@ -75,14 +75,16 @@ func (e EditClass) Render() gr.Component {
 
 			classForm, classJson := EditClassFormBuilder(state.Interface("classData").([]byte))
 
-			classForm.CreateElement(gr.Props{
-				"className":     classJson.S("className").Data().(string),
-				"class":         classJson.S("class").Bytes(),
-				"backButton":    e.stepTwoBack,
-				"apiType":       props.String("apiType"),
-				"hasDelete":     true,
-				"hideAllModals": hideAllModals,
-			}).Modify(response)
+			classForm.CreateElement(
+				gr.Props{
+					"className":     classJson.S("className").Data().(string),
+					"class":         classJson.S("class").Bytes(),
+					"backButton":    e.stepTwoBack,
+					"apiType":       props.String("apiType"),
+					"hasDelete":     true,
+					"hideAllModals": hideAllModals,
+				},
+			).Modify(response)
 		}
 	}
 

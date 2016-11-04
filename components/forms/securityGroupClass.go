@@ -6,8 +6,10 @@ import (
 
 	"github.com/Jeffail/gabs"
 	"github.com/bep/gr"
+	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
 	"github.com/bep/gr/evt"
+	"github.com/murdinc/awsm/config"
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
@@ -19,7 +21,7 @@ type SecurityGroupClassForm struct {
 
 // Implements the StateInitializer interface
 func (s SecurityGroupClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "", "step": 1}
+	return gr.State{"querying": false, "error": "", "success": "", "step": 1}
 }
 
 // Implements the ComponentDidMount interface
@@ -48,6 +50,36 @@ func (s SecurityGroupClassForm) ComponentWillMount() {
 
 		s.SetState(gr.State{"classOptionsResp": resp, "querying": false})
 	}()
+}
+
+func (s SecurityGroupClassForm) addGrant(*gr.Event) {
+	grants, ok := s.State().Interface("securityGroupGrants").([]interface{})
+	if ok {
+		grants = append(grants, &config.SecurityGroupGrant{
+			Note:       "New Grant",
+			Type:       "ingress",
+			FromPort:   0,
+			ToPort:     0,
+			IPProtocol: "tcp",
+			CidrIP:     []string{},
+		})
+		s.SetState(gr.State{"securityGroupGrants": grants})
+		return
+	}
+	println("addGrant failed?")
+}
+
+func (s SecurityGroupClassForm) removeGrant(event *gr.Event) {
+	//s.SetState(gr.State{"querying": true})
+
+	index := event.Target().Get("id").Int() // String()
+	grants, ok := s.State().Interface("securityGroupGrants").([]interface{})
+	if ok {
+		grants = append(grants[:index], grants[index+1:]...)
+		s.SetState(gr.State{"securityGroupGrants": grants})
+		return
+	}
+	println("removeGrant failed?")
 }
 
 func (s SecurityGroupClassForm) Render() gr.Component {
@@ -101,15 +133,55 @@ func (s SecurityGroupClassForm) Render() gr.Component {
 	return response
 }
 
+func (s SecurityGroupClassForm) modifyGrant(index int, grant map[string]interface{}) func(*gr.Event) {
+	return func(event *gr.Event) {
+		key := event.Target().Get("id").String()
+		grant[key] = event.TargetValue()
+		grants, ok := s.State().Interface("securityGroupGrants").([]interface{})
+		if ok {
+			grants[index] = grant
+			s.SetState(gr.State{"securityGroupGrants": grants})
+			return
+		}
+		println("modifyGrant failed?")
+	}
+}
+
+func (s SecurityGroupClassForm) storeSelect(index int, grant map[string]interface{}) func(string, interface{}) {
+	return func(id string, val interface{}) {
+
+		switch value := val.(type) {
+
+		case map[string]interface{}:
+			// single
+			grant[id] = value["value"]
+
+		case []interface{}:
+			// multi
+			var vals []string
+			options := len(value)
+			for i := 0; i < options; i++ {
+				vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+			}
+			grant[id] = vals
+
+		default:
+			grant[id] = val
+		}
+
+		grants, ok := s.State().Interface("securityGroupGrants").([]interface{})
+		if ok {
+			grants[index] = grant
+			s.SetState(gr.State{"securityGroupGrants": grants})
+			return
+		}
+	}
+}
+
 func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp interface{}) *gr.Element {
 
 	state := s.State()
 	props := s.Props()
-
-	var classOptions map[string][]string
-	jsonParsed, _ := gabs.ParseJSON(optionsResp.([]byte))
-	classOptionsJson := jsonParsed.S("classOptions").Bytes()
-	json.Unmarshal(classOptionsJson, &classOptions)
 
 	classEdit := el.Div(
 		el.Header3(gr.Text(className)),
@@ -118,39 +190,115 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 
 	classEditForm := el.Form()
 
-	textField("Description", "description", &state, s.storeValue).Modify(classEditForm)
-	//TODO Grants
+	textField("Description", "description", state.String("description"), s.storeValue).Modify(classEditForm)
 
-	classEditForm.Modify(classEdit)
+	el.Div(
+		el.Break(nil),
+		el.Header4(
+			gr.Text("Grants"),
+			el.Button(
+				evt.Click(s.addGrant).PreventDefault(),
+				gr.CSS("btn", "btn-primary", "pull-right"),
+				gr.Text("New"),
+			),
+		),
+		el.HorizontalRule(nil),
+	).Modify(classEditForm)
 
-	buttons := el.Div(
-		gr.CSS("btn-toolbar"),
-	)
+	optionsRespByte, ok := optionsResp.([]byte)
+	if ok {
 
-	// Back
-	el.Button(
-		evt.Click(s.backButton).PreventDefault(),
-		gr.CSS("btn", "btn-secondary"),
-		gr.Text("Back"),
-	).Modify(buttons)
+		var classOptions map[string][]string
 
-	// Save
-	el.Button(
-		evt.Click(s.saveButton).PreventDefault(),
-		gr.CSS("btn", "btn-primary"),
-		gr.Text("Save"),
-	).Modify(buttons)
+		jsonParsed, _ := gabs.ParseJSON(optionsRespByte)
+		classOptionsJson := jsonParsed.S("classOptions").Bytes()
+		json.Unmarshal(classOptionsJson, &classOptions)
 
-	// Delete
-	if props.Interface("hasDelete") != nil && props.Bool("hasDelete") {
+		grants := state.Interface("securityGroupGrants").([]interface{})
+
+		for index, g := range grants {
+
+			grant := g.(map[string]interface{})
+
+			// Form placeholder
+			grantForm := el.Div()
+
+			textField("Note", "note", grant["note"], s.modifyGrant(index, grant)).Modify(grantForm)
+
+			el.Div(
+				gr.CSS("row"), el.Div(gr.CSS("col-sm-3"),
+					selectOne("Type", "type", []string{"ingress", "egress"}, grant["type"], s.storeSelect(index, grant)),
+				),
+				el.Div(gr.CSS("col-sm-3"),
+					numberField("From Port", "fromPort", grant["fromPort"], s.modifyGrant(index, grant)),
+				),
+				el.Div(gr.CSS("col-sm-3"),
+					numberField("To Port", "toPort", grant["toPort"], s.modifyGrant(index, grant)),
+				),
+				el.Div(gr.CSS("col-sm-3"),
+					selectOne("IP Protocol", "ipProtocol", []string{"tcp", "udp", "icmp"}, grant["ipProtocol"], s.storeSelect(index, grant)),
+				),
+			).Modify(grantForm)
+
+			el.Div(
+				gr.CSS("row"),
+				el.Div(gr.CSS("col-sm-12"),
+					createableSelectMultiple("CIDR IP's", "cidrIP", []string{ /* TODO */ }, grant["cidrIP"], s.storeSelect(index, grant)),
+				),
+			).Modify(grantForm)
+
+			el.Div(
+				gr.CSS("btn-toolbar"),
+				el.Button(
+					evt.Click(s.removeGrant).PreventDefault(),
+					gr.CSS("btn", "btn-danger", "pull-right"),
+					gr.Text("Remove"),
+					attr.ID(props.String("index")),
+				),
+			).Modify(grantForm)
+
+			el.HorizontalRule(nil).Modify(grantForm)
+
+			grantForm.Modify(classEditForm)
+
+		}
+
+		s.Children().Set("TEST", gr.Props{"modifyGrant": s.modifyGrant})
+
+		s.Children().Element().Modify(classEditForm)
+
+		classEditForm.Modify(classEdit)
+
+		buttons := el.Div(
+			gr.CSS("btn-toolbar"),
+		)
+
+		// Back
 		el.Button(
-			evt.Click(s.deleteButton).PreventDefault(),
-			gr.CSS("btn", "btn-danger", "pull-right"),
-			gr.Text("Delete"),
+			evt.Click(s.backButton).PreventDefault(),
+			gr.CSS("btn", "btn-secondary"),
+			gr.Text("Back"),
 		).Modify(buttons)
-	}
 
-	buttons.Modify(classEdit)
+		// Save
+		el.Button(
+			evt.Click(s.saveButton).PreventDefault(),
+			gr.CSS("btn", "btn-primary"),
+			gr.Text("Save"),
+		).Modify(buttons)
+
+		// Delete
+		if props.Interface("hasDelete") != nil && props.Bool("hasDelete") {
+			el.Button(
+				evt.Click(s.deleteButton).PreventDefault(),
+				gr.CSS("btn", "btn-danger", "pull-right"),
+				gr.Text("Delete"),
+			).Modify(buttons)
+		}
+
+		buttons.Modify(classEdit)
+
+	}
 
 	return classEdit
 
@@ -226,28 +374,6 @@ func (s SecurityGroupClassForm) storeValue(event *gr.Event) {
 
 	default: // text, at least
 		s.SetState(gr.State{id: event.TargetValue()})
-
-	}
-}
-
-func (s SecurityGroupClassForm) storeSelect(id string, val interface{}) {
-	switch value := val.(type) {
-
-	case map[string]interface{}:
-		// single
-		s.SetState(gr.State{id: value["value"]})
-
-	case []interface{}:
-		// multi
-		var vals []string
-		options := len(value)
-		for i := 0; i < options; i++ {
-			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
-		}
-		s.SetState(gr.State{id: vals})
-
-	default:
-		s.SetState(gr.State{id: val})
 
 	}
 }
