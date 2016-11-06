@@ -106,11 +106,6 @@ func (l LaunchConfigurationClassForm) BuildClassForm(className string, optionsRe
 	state := l.State()
 	props := l.Props()
 
-	var classOptions map[string][]string
-	jsonParsed, _ := gabs.ParseJSON(optionsResp.([]byte))
-	classOptionsJson := jsonParsed.S("classOptions").Bytes()
-	json.Unmarshal(classOptionsJson, &classOptions)
-
 	classEdit := el.Div(
 		el.Header3(gr.Text(className)),
 		el.HorizontalRule(),
@@ -118,13 +113,18 @@ func (l LaunchConfigurationClassForm) BuildClassForm(className string, optionsRe
 
 	classEditForm := el.Form()
 
+	var classOptions map[string][]string
+	jsonParsed, _ := gabs.ParseJSON(optionsResp.([]byte))
+	classOptionsJson := jsonParsed.S("classOptions").Bytes()
+	json.Unmarshal(classOptionsJson, &classOptions)
+
 	numberField("Version", "version", state.Int("version"), l.storeValue).Modify(classEditForm)
-	selectOne("Instance Class", "instanceClass", classOptions["instances"], &state, l.storeSelect).Modify(classEditForm)
+	selectOne("Instance Class", "instanceClass", classOptions["instances"], state.Interface("instanceClass"), l.storeSelect).Modify(classEditForm)
 	checkbox("Rotate", "rotate", state.Bool("rotate"), l.storeValue).Modify(classEditForm)
 	if state.Bool("rotate") {
 		numberField("Retain", "retain", state.Int("retain"), l.storeValue).Modify(classEditForm)
 	}
-	selectMultiple("Regions", "regions", classOptions["regions"], &state, l.storeSelect).Modify(classEditForm)
+	selectMultiple("Regions", "regions", classOptions["regions"], state.Interface("regions"), l.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

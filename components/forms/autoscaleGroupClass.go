@@ -127,29 +127,29 @@ func (a AutoscaleGroupClassForm) BuildClassForm(className string, optionsResp in
 
 	classEditForm := el.Form()
 
-	selectOne("Launch Configuration Class", "launchConfigurationClass", classOptions["launchconfigurations"], &state, a.storeSelect).Modify(classEditForm)
+	selectOne("Launch Configuration Class", "launchConfigurationClass", classOptions["launchconfigurations"], state.Interface("launchConfigurationClass"), a.storeSelect).Modify(classEditForm)
 
-	//checkbox("Rotate", "rotate", &state, a.storeValue).Modify(classEditForm)
+	//checkbox("Rotate", "rotate", state.Interface("rotate"), a.storeValue).Modify(classEditForm)
 	//if state.Bool("rotate") {
 	numberField("Retain", "retain", state.Int("retain"), a.storeValue).Modify(classEditForm)
 	//}
 	checkbox("Propagate", "propagate", state.Bool("propagate"), a.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
-		//selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], &state, a.storeValue).Modify(classEditForm)
+		//selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), a.storeValue).Modify(classEditForm)
 	}
 
-	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], &state, a.storeSelect).Modify(classEditForm)
+	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], state.Interface("availabilityZones"), a.storeSelect).Modify(classEditForm)
 	numberField("Desired Capacity", "desiredCapacity", state.Int("desiredCapacity"), a.storeValue).Modify(classEditForm)
 	numberField("Min Size", "minSize", state.Int("minSize"), a.storeValue).Modify(classEditForm)
 	numberField("Max Size", "maxSize", state.Int("maxSize"), a.storeValue).Modify(classEditForm)
 	numberField("Default Cooldown", "defaultCooldown", state.Int("defaultCooldown"), a.storeValue).Modify(classEditForm)
-	selectOne("Subnet Class", "subnetClass", classOptions["subnets"], &state, a.storeSelect).Modify(classEditForm)
-	selectOne("Health Check Type", "healthCheckType", healthCheckTypes, &state, a.storeSelect).Modify(classEditForm)
+	selectOne("Subnet Class", "subnetClass", classOptions["subnets"], state.Interface("subnetClass"), a.storeSelect).Modify(classEditForm)
+	selectOne("Health Check Type", "healthCheckType", healthCheckTypes, state.Interface("healthCheckType"), a.storeSelect).Modify(classEditForm)
 	numberField("Health Check Grace Period", "healthCheckGracePeriod", state.Int("healthCheckGracePeriod"), a.storeValue).Modify(classEditForm)
-	selectMultiple("Termination Policies", "terminationPolicies", terminationPolicies, &state, a.storeSelect).Modify(classEditForm)
-	selectMultiple("Scaling Policies", "scalingPolicies", classOptions["scalingpolicies"], &state, a.storeSelect).Modify(classEditForm)
-	selectMultiple("Load Balancer Names", "loadBalancerNames", classOptions["loadbalancers"], &state, a.storeSelect).Modify(classEditForm)
-	selectMultiple("Alarms", "alarms", classOptions["alarms"], &state, a.storeSelect).Modify(classEditForm)
+	selectMultiple("Termination Policies", "terminationPolicies", terminationPolicies, state.Interface("terminationPolicies"), a.storeSelect).Modify(classEditForm)
+	selectMultiple("Scaling Policies", "scalingPolicies", classOptions["scalingpolicies"], state.Interface("scalingPolicies"), a.storeSelect).Modify(classEditForm)
+	selectMultiple("Load Balancer Names", "loadBalancerNames", classOptions["loadbalancers"], state.Interface("loadBalancerNames"), a.storeSelect).Modify(classEditForm)
+	selectMultiple("Alarms", "alarms", classOptions["alarms"], state.Interface("alarms"), a.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

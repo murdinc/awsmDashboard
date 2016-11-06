@@ -122,7 +122,7 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 	textField("Instance ID", "instanceID", state.String("instanceID"), i.storeValue).Modify(classEditForm) // select one?
 	checkbox("Propagate", "propagate", state.Bool("propagate"), i.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
-		selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], &state, i.storeSelect).Modify(classEditForm)
+		selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), i.storeSelect).Modify(classEditForm)
 	}
 	checkbox("Rotate", "rotate", state.Bool("rotate"), i.storeValue).Modify(classEditForm)
 	if state.Bool("rotate") {

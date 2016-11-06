@@ -55,14 +55,16 @@ func (s SecurityGroupClassForm) ComponentWillMount() {
 func (s SecurityGroupClassForm) addGrant(*gr.Event) {
 	grants, ok := s.State().Interface("securityGroupGrants").([]interface{})
 	if ok {
-		grants = append(grants, &config.SecurityGroupGrant{
-			Note:       "New Grant",
-			Type:       "ingress",
-			FromPort:   0,
-			ToPort:     0,
-			IPProtocol: "tcp",
-			CidrIP:     []string{},
-		})
+		grants = append([]interface{}{
+			&config.SecurityGroupGrant{
+				Note:       "New Grant",
+				Type:       "ingress",
+				FromPort:   0,
+				ToPort:     0,
+				IPProtocol: "tcp",
+				CidrIP:     []string{},
+			},
+		}, grants...)
 		s.SetState(gr.State{"securityGroupGrants": grants})
 		return
 	}
@@ -70,9 +72,9 @@ func (s SecurityGroupClassForm) addGrant(*gr.Event) {
 }
 
 func (s SecurityGroupClassForm) removeGrant(event *gr.Event) {
-	//s.SetState(gr.State{"querying": true})
-
-	index := event.Target().Get("id").Int() // String()
+	index := event.Target().Get("id").Int()
+	println("Deleting: ")
+	println(index)
 	grants, ok := s.State().Interface("securityGroupGrants").([]interface{})
 	if ok {
 		grants = append(grants[:index], grants[index+1:]...)
@@ -136,7 +138,18 @@ func (s SecurityGroupClassForm) Render() gr.Component {
 func (s SecurityGroupClassForm) modifyGrant(index int, grant map[string]interface{}) func(*gr.Event) {
 	return func(event *gr.Event) {
 		key := event.Target().Get("id").String()
-		grant[key] = event.TargetValue()
+		valueType := event.Target().Get("type").String()
+
+		switch valueType {
+		case "text":
+			grant[key] = event.TargetValue().String()
+		case "number":
+			grant[key] = event.TargetValue().Int()
+		default:
+			println("modifyGrant does not have a switch for type:")
+			println(valueType)
+		}
+
 		grants, ok := s.State().Interface("securityGroupGrants").([]interface{})
 		if ok {
 			grants[index] = grant
@@ -198,7 +211,7 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 			gr.Text("Grants"),
 			el.Button(
 				evt.Click(s.addGrant).PreventDefault(),
-				gr.CSS("btn", "btn-primary", "pull-right"),
+				gr.CSS("btn", "btn-primary", "btn-sm", "pull-right"),
 				gr.Text("New"),
 			),
 		),
@@ -251,9 +264,9 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 				gr.CSS("btn-toolbar"),
 				el.Button(
 					evt.Click(s.removeGrant).PreventDefault(),
-					gr.CSS("btn", "btn-danger", "pull-right"),
+					gr.CSS("btn", "btn-danger", "btn-sm", "pull-right"),
 					gr.Text("Remove"),
-					attr.ID(props.String("index")),
+					attr.ID(index),
 				),
 			).Modify(grantForm)
 
@@ -262,10 +275,6 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 			grantForm.Modify(classEditForm)
 
 		}
-
-		s.Children().Set("TEST", gr.Props{"modifyGrant": s.modifyGrant})
-
-		s.Children().Element().Modify(classEditForm)
 
 		classEditForm.Modify(classEdit)
 

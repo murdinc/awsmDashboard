@@ -6,8 +6,10 @@ import (
 
 	"github.com/Jeffail/gabs"
 	"github.com/bep/gr"
+	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
 	"github.com/bep/gr/evt"
+	"github.com/murdinc/awsm/config"
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
@@ -120,11 +122,68 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 
 	classEditForm := el.Form()
 
-	selectOne("Scheme", "scheme", elbSchemes, &state, l.storeSelect).Modify(classEditForm)
-	selectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], &state, l.storeSelect).Modify(classEditForm)
-	selectMultiple("Subnets", "subnets", classOptions["subnets"], &state, l.storeSelect).Modify(classEditForm)
-	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], &state, l.storeSelect).Modify(classEditForm)
-	// TODO Listeners
+	selectOne("Scheme", "scheme", elbSchemes, state.Interface("scheme"), l.storeSelect).Modify(classEditForm)
+	selectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], state.Interface("securityGroups"), l.storeSelect).Modify(classEditForm)
+	selectMultiple("Subnets", "subnets", classOptions["subnets"], state.Interface("subnets"), l.storeSelect).Modify(classEditForm)
+	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], state.Interface("availabilityZones"), l.storeSelect).Modify(classEditForm)
+
+	el.Div(
+		el.Break(nil),
+		el.Header4(
+			gr.Text("Listeners"),
+			el.Button(
+				evt.Click(l.addListener).PreventDefault(),
+				gr.CSS("btn", "btn-primary", "btn-sm", "pull-right"),
+				gr.Text("New"),
+			),
+		),
+		el.HorizontalRule(nil),
+	).Modify(classEditForm)
+
+	listeners := state.Interface("listeners").([]interface{})
+
+	for index, listInf := range listeners {
+
+		listener := listInf.(map[string]interface{})
+
+		// Form placeholder
+		listenerForm := el.Div()
+
+		//textField("Note", "note", listener["note"], l.modifyListener(index, listener)).Modify(listenerForm)
+
+		el.Div(
+			gr.CSS("row"), el.Div(gr.CSS("col-sm-6"),
+				selectOne("Protocol", "protocol", []string{"tcp", "udp", "icmp"}, listener["protocol"], l.storeListenerSelect(index, listener)),
+			),
+			el.Div(gr.CSS("col-sm-6"),
+				numberField("Load Balancer Port", "loadBalancerPort", listener["loadBalancerPort"], l.modifyListener(index, listener)),
+			),
+		).Modify(listenerForm)
+
+		el.Div(
+			gr.CSS("row"), el.Div(gr.CSS("col-sm-6"),
+				selectOne("Instance Protocol", "instanceProtocol", []string{"tcp", "udp", "icmp"}, listener["instanceProtocol"], l.storeListenerSelect(index, listener)),
+			),
+			el.Div(gr.CSS("col-sm-6"),
+				numberField("Instance Port", "instancePort", listener["instancePort"], l.modifyListener(index, listener)),
+			),
+		).Modify(listenerForm)
+
+		el.Div(
+			gr.CSS("btn-toolbar"),
+			el.Button(
+				evt.Click(l.removeListener).PreventDefault(),
+				gr.CSS("btn", "btn-danger", "btn-sm", "pull-right"),
+				gr.Text("Remove"),
+				attr.ID(index),
+			),
+		).Modify(listenerForm)
+
+		el.HorizontalRule(nil).Modify(listenerForm)
+
+		listenerForm.Modify(classEditForm)
+
+	}
 
 	classEditForm.Modify(classEdit)
 
@@ -255,4 +314,85 @@ func (l LoadBalancerClassForm) storeSelect(id string, val interface{}) {
 		l.SetState(gr.State{id: val})
 
 	}
+}
+
+func (l LoadBalancerClassForm) modifyListener(index int, listener map[string]interface{}) func(*gr.Event) {
+	return func(event *gr.Event) {
+		key := event.Target().Get("id").String()
+		valueType := event.Target().Get("type").String()
+
+		switch valueType {
+		case "text":
+			listener[key] = event.TargetValue().String()
+		case "number":
+			listener[key] = event.TargetValue().Int()
+		}
+		listeners, ok := l.State().Interface("listeners").([]interface{})
+		if ok {
+			listeners[index] = listener
+			l.SetState(gr.State{"listeners": listeners})
+			return
+		}
+		println("modifyListener failed?")
+	}
+}
+
+func (l LoadBalancerClassForm) storeListenerSelect(index int, listener map[string]interface{}) func(string, interface{}) {
+	return func(id string, val interface{}) {
+
+		switch value := val.(type) {
+
+		case map[string]interface{}:
+			// single
+			listener[id] = value["value"]
+
+		case []interface{}:
+			// multi
+			var vals []string
+			options := len(value)
+			for i := 0; i < options; i++ {
+				vals = append(vals, value[i].(map[string]interface{})["value"].(string))
+			}
+			listener[id] = vals
+
+		default:
+			listener[id] = val
+		}
+
+		listeners, ok := l.State().Interface("listeners").([]interface{})
+		if ok {
+			listeners[index] = listener
+			l.SetState(gr.State{"listeners": listeners})
+			return
+		}
+	}
+}
+
+func (l LoadBalancerClassForm) addListener(*gr.Event) {
+	listeners, ok := l.State().Interface("listeners").([]interface{})
+	if ok {
+		listeners = append([]interface{}{
+			&config.LoadBalancerListener{
+				Protocol:         "",
+				LoadBalancerPort: 0,
+				InstanceProtocol: "",
+				InstancePort:     0,
+				SSLCertificateID: "",
+			},
+		}, listeners...)
+		l.SetState(gr.State{"listeners": listeners})
+		return
+	}
+	println("addListener failed?")
+}
+
+func (l LoadBalancerClassForm) removeListener(event *gr.Event) {
+	index := event.Target().Get("id").Int()
+	listeners, ok := l.State().Interface("listeners").([]interface{})
+	if ok {
+		listeners = append(listeners[:index], listeners[index+1:]...)
+		l.SetState(gr.State{"listeners": listeners})
+		return
+	}
+	println("removeListener failed?")
 }

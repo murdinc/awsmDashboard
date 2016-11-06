@@ -38,6 +38,7 @@ func textField(name, id string, v interface{}, storeFunc func(*gr.Event)) *gr.El
 }
 
 func numberField(name, id string, value interface{}, storeFunc func(*gr.Event)) *gr.Element {
+
 	return el.Div(
 		gr.CSS("form-group"),
 		el.Label(

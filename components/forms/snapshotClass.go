@@ -126,7 +126,7 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 	}
 	checkbox("Propagate", "propagate", state.Bool("propagate"), s.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
-		selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], &state, s.storeSelect).Modify(classEditForm)
+		selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), s.storeSelect).Modify(classEditForm)
 	}
 
 	textField("Volume ID", "volumeID", state.String("volumeID"), s.storeValue).Modify(classEditForm) // select one?

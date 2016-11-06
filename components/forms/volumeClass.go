@@ -127,8 +127,8 @@ func (v VolumeClassForm) BuildClassForm(className string, optionsResp interface{
 	numberField("Volume Size", "volumeSize", state.Int("volumeSize"), v.storeValue).Modify(classEditForm)
 	checkbox("Delete On Termination", "deleteOnTermination", state.Bool("deleteOnTermination"), v.storeValue).Modify(classEditForm)
 	textField("Mount Point", "mountPoint", state.String("mountPoint"), v.storeValue).Modify(classEditForm)
-	selectOne("Snapshot", "snapshot", classOptions["snapshots"], &state, v.storeSelect).Modify(classEditForm)
-	selectOne("Volume Type", "volumeType", volumeTypes, &state, v.storeSelect).Modify(classEditForm)
+	selectOne("Snapshot", "snapshot", classOptions["snapshots"], state.Interface("snapshot"), v.storeSelect).Modify(classEditForm)
+	selectOne("Volume Type", "volumeType", volumeTypes, state.Interface("volumeType"), v.storeSelect).Modify(classEditForm)
 	if state.String("volumeType") == "io1" {
 		numberField("IOPS", "iops", state.Int("iops"), v.storeValue).Modify(classEditForm)
 	}
