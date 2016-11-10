@@ -22,7 +22,7 @@ func (l LaunchConfigurationClassForm) GetInitialState() gr.State {
 	}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (l LaunchConfigurationClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

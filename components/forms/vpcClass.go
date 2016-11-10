@@ -26,7 +26,7 @@ func (v VpcClassForm) GetInitialState() gr.State {
 	}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (v VpcClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

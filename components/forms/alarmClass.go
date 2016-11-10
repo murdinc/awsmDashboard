@@ -35,7 +35,7 @@ func (a AlarmClassForm) GetInitialState() gr.State {
 	}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (a AlarmClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

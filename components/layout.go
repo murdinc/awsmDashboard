@@ -19,6 +19,7 @@ type Page struct {
 	ApiType    string
 	Type       string
 	HasClasses bool
+	HasWidgets bool
 }
 
 // Implements the Renderer interface.

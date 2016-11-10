@@ -14,9 +14,9 @@ var (
 	pages = components.Pages{
 		"Dashboard": components.Page{
 			Route:      "/",
-			ApiType:    "securitygroups",
+			ApiType:    "dashboard",
 			Type:       "Dashboard",
-			HasClasses: true,
+			HasWidgets: true,
 		},
 		"Instances": components.Page{
 			Route:      "/instances",

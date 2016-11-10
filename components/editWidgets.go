@@ -10,30 +10,30 @@ import (
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
-type EditClass struct {
+type EditWidgets struct {
 	*gr.This
 }
 
 // Implements the StateInitializer interface
-func (e EditClass) GetInitialState() gr.State {
-	return gr.State{"step": 1, "selectedClass": "", "querying": false, "error": "", "classData": nil}
+func (e EditWidgets) GetInitialState() gr.State {
+	return gr.State{"step": 1, "selectedWidget": "", "querying": false, "error": "", "widgetData": nil}
 }
 
-func (e EditClass) ComponentWillMount() {
-	e.getClassList()
+func (e EditWidgets) ComponentWillMount() {
+	e.getWidgetsList()
 }
 
-func (e EditClass) doneButton(*gr.Event) {
+func (e EditWidgets) doneButton(*gr.Event) {
 	e.SetState(gr.State{"success": ""})
 	hideAllModals()
 }
 
-func (e EditClass) Render() gr.Component {
+func (e EditWidgets) Render() gr.Component {
 
 	state := e.State()
 	props := e.Props()
 
-	// Class List placeholder
+	// Widget List placeholder
 	response := el.Div()
 
 	if state.Bool("querying") {
@@ -47,12 +47,12 @@ func (e EditClass) Render() gr.Component {
 
 			// STEP 1
 
-			if classes := state.Interface("classList"); classes != nil {
-				classList := ClassListBuilder(classes, e.selectClass) // Build the class list
-				classList.Modify(response)
+			if widgets := state.Interface("widgetList"); widgets != nil {
+				widgetList := ClassListBuilder(widgets, e.selectWidget) // Build the widget list
+				widgetList.Modify(response)
 			} else {
 
-				helpers.ErrorElem("No existing " + props.String("apiType") + " classes found!").Modify(response)
+				helpers.ErrorElem("No existing " + props.String("apiType") + " widgets found!").Modify(response)
 
 				buttons := el.Div(
 					gr.CSS("btn-toolbar"),
@@ -73,12 +73,12 @@ func (e EditClass) Render() gr.Component {
 
 			// STEP 2
 
-			classForm, classJson := EditClassFormBuilder(state.Interface("classData").([]byte))
+			widgetForm, widgetJson := EditClassFormBuilder(state.Interface("widgetData").([]byte))
 
-			classForm.CreateElement(
+			widgetForm.CreateElement(
 				gr.Props{
-					"className":     classJson.S("className").Data().(string),
-					"class":         classJson.S("class").Bytes(),
+					"widgetName":    widgetJson.S("widgetName").Data().(string),
+					"widget":        widgetJson.S("widget").Bytes(),
 					"backButton":    e.stepTwoBack,
 					"apiType":       props.String("apiType"),
 					"hasDelete":     true,
@@ -91,11 +91,11 @@ func (e EditClass) Render() gr.Component {
 	return response
 }
 
-func (e EditClass) getClassList() {
+func (e EditWidgets) getWidgetsList() {
 	go func() {
 		if apiType := e.Props().String("apiType"); apiType != "" {
 			e.SetState(gr.State{"querying": true})
-			endpoint := "//localhost:8081/api/classes/" + apiType
+			endpoint := "//localhost:8081/api/" + apiType + "/widgets/options"
 			resp, err := helpers.GetAPI(endpoint)
 			if !e.IsMounted() {
 				return
@@ -109,21 +109,21 @@ func (e EditClass) getClassList() {
 
 			success, ok := respParsed.S("success").Data().(bool)
 			if !ok || !success {
-				println("no existing " + e.Props().String("apiType") + " classes found")
+				println("no existing " + e.Props().String("apiType") + " widgets found")
 				e.SetState(gr.State{"querying": false})
 				return
 			}
 
-			e.SetState(gr.State{"querying": false, "classList": resp})
+			e.SetState(gr.State{"querying": false, "widgetList": resp})
 		}
 	}()
 }
 
-func (e *EditClass) selectClass(name string) {
+func (e *EditWidgets) selectWidget(name string) {
 	e.SetState(gr.State{"querying": true})
 	go func() {
 		if apiType := e.Props().String("apiType"); apiType != "" {
-			endpoint := "//localhost:8081/api/classes/" + apiType + "/name/" + name
+			endpoint := "//localhost:8081/api/widgets/" + apiType + "/name/" + name
 			resp, err := helpers.GetAPI(endpoint)
 			if !e.IsMounted() {
 				return
@@ -132,13 +132,13 @@ func (e *EditClass) selectClass(name string) {
 				e.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
 				return
 			}
-			e.SetState(gr.State{"classData": resp})
+			e.SetState(gr.State{"widgetData": resp})
 		}
-		e.SetState(gr.State{"querying": false, "step": 2, "selectedClass": name})
+		e.SetState(gr.State{"querying": false, "step": 2, "selectedWidget": name})
 	}()
 }
 
-func (e EditClass) stepTwoBack() {
-	e.getClassList()
+func (e EditWidgets) stepTwoBack() {
+	e.getWidgetsList()
 	e.SetState(gr.State{"step": 1})
 }

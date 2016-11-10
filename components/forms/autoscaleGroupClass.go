@@ -31,7 +31,7 @@ func (a AutoscaleGroupClassForm) GetInitialState() gr.State {
 	}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (a AutoscaleGroupClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

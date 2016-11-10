@@ -162,3 +162,13 @@ dl {
 .Select {
     font-size: 14px;
 }
+
+.widget>.panel-heading {
+    color: #fff;
+    background-color: #5f80a0;
+    border-color: #2c3e50;
+}
+
+.widget {
+    border-color: #2c3e50;
+}

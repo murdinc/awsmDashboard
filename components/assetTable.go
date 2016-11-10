@@ -43,8 +43,8 @@ func (a AssetTable) Render() gr.Component {
 	return elem
 }
 
-// Implements the ComponentDidMount interface
-func (a AssetTable) ComponentDidMount() {
+// Implements the ComponentWillMount interface
+func (a AssetTable) ComponentWillMount() {
 	if apiType := a.Props().String("apiType"); apiType != "" {
 		a.SetState(gr.State{"querying": true})
 		endpoint := "//localhost:8081/api/assets/" + apiType
@@ -70,17 +70,19 @@ func (a AssetTable) ShouldComponentUpdate(this *gr.This, next gr.Cops) bool {
 }
 
 func AssetTableBuilder(al interface{}) *gr.Element {
-
 	assetList := al.([]byte)
 
 	jsonParsed, _ := gabs.ParseJSON(assetList)
 	assetType := jsonParsed.S("assetType").Data().(string)
 	assets, _ := jsonParsed.S("assets").Children()
 
+	if len(assets) < 1 {
+		return el.Div(gr.Text("Nothing here!"))
+	}
+
 	var header []string
 	rows := make([][]string, len(assets))
 
-	tBody := el.TableBody()
 	switch assetType {
 
 	case "alarms":
@@ -219,35 +221,16 @@ func AssetTableBuilder(al interface{}) *gr.Element {
 		println(assetType)
 	}
 
-	buildTableRows(rows, tBody)
+	tBody := el.TableBody()
+
+	helpers.BuildTableRows(rows, tBody)
 
 	table := el.Table(
 		gr.CSS("table", "table-striped"),
 		gr.Style("width", "100%"),
-		el.TableHead(el.TableRow(buildTableHeader(header)...)))
+		el.TableHead(el.TableRow(helpers.BuildTableHeader(header)...)))
 
 	tBody.Modify(table)
 
 	return table
-}
-
-func buildTableRows(rows [][]string, tBody *gr.Element) {
-	for _, row := range rows {
-		var rowEls = make([]gr.Modifier, len(row))
-
-		for ri, rowName := range row {
-			rowEls[ri] = el.TableData(gr.Text(rowName))
-		}
-
-		tr := el.TableRow(rowEls...)
-		tr.Modify(tBody)
-	}
-}
-
-func buildTableHeader(header []string) []gr.Modifier {
-	var tableHeader = make([]gr.Modifier, len(header))
-	for i, head := range header {
-		tableHeader[i] = el.TableHeader(gr.Text(head))
-	}
-	return tableHeader
 }

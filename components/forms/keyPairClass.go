@@ -22,7 +22,7 @@ func (k KeyPairClassForm) GetInitialState() gr.State {
 	return gr.State{"querying": true, "error": "", "success": "", "step": 1}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (k KeyPairClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

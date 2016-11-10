@@ -36,7 +36,7 @@ func (i InstanceClassForm) GetInitialState() gr.State {
 	}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (i InstanceClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

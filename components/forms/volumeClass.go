@@ -27,7 +27,7 @@ func (v VolumeClassForm) GetInitialState() gr.State {
 	}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (v VolumeClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

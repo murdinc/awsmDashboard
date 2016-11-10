@@ -8,15 +8,15 @@ import (
 	"github.com/bep/gr/evt"
 )
 
-type AssetDropdownMenu struct {
+type ClassDropdownMenu struct {
 	*gr.This
 }
 
-func (d AssetDropdownMenu) triggerRefresh(event *gr.Event) {
+func (d ClassDropdownMenu) triggerRefresh(event *gr.Event) {
 	d.SetState(gr.State{"nonce": time.Now()})
 }
 
-func (d AssetDropdownMenu) Render() gr.Component {
+func (d ClassDropdownMenu) Render() gr.Component {
 
 	//state := d.State()
 	props := d.Props()
@@ -30,8 +30,6 @@ func (d AssetDropdownMenu) Render() gr.Component {
 			gr.CSS("btn", "btn-primary", "btn-xs", "dropdown-toggle"),
 			el.Italic(gr.CSS("fa", "fa-gear")),
 			gr.Data("toggle", "dropdown"),
-			//gr.Aria("haspopup", "true"),
-			//gr.Aria("expanded", "false"),
 		),
 	)
 

@@ -24,7 +24,7 @@ func (s SnapshotClassForm) GetInitialState() gr.State {
 	}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (s SnapshotClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

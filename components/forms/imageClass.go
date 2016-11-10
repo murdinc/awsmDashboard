@@ -23,7 +23,7 @@ func (i ImageClassForm) GetInitialState() gr.State {
 	}
 }
 
-// Implements the ComponentDidMount interface
+// Implements the ComponentWillMount interface
 func (i ImageClassForm) ComponentWillMount() {
 	var class map[string]interface{}
 

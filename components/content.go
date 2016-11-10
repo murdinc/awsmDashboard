@@ -23,9 +23,18 @@ func (c Content) Render() gr.Component {
 		),
 	)
 	if c.Page.HasClasses {
-		gr.New(&AssetDropdownMenu{}).CreateElement(gr.Props{"type": c.Page.Type, "apiType": c.Page.ApiType}).Modify(header)
+		gr.New(&ClassDropdownMenu{}).CreateElement(gr.Props{"type": c.Page.Type, "apiType": c.Page.ApiType}).Modify(header)
+	}
+	if c.Page.HasWidgets {
+		gr.New(&WidgetDropdownMenu{}).CreateElement(gr.Props{"type": c.Page.Type, "apiType": c.Page.ApiType}).Modify(header)
 	}
 	header.Modify(resp)
+
+	// Dashboard
+	if c.Page.ApiType == "dashboard" {
+		gr.New(&Dashboard{}).CreateElement(gr.Props{"apiType": c.Page.ApiType}).Modify(resp)
+		return resp
+	}
 
 	// Asset Table
 	gr.New(&AssetTable{}).CreateElement(gr.Props{"apiType": c.Page.ApiType}).Modify(resp)
