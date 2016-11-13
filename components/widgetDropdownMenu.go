@@ -37,7 +37,13 @@ func (d WidgetDropdownMenu) Render() gr.Component {
 		gr.CSS("dropdown-menu"),
 	)
 
+	el.ListItem(el.Anchor(gr.Data("toggle", "modal"), gr.Data("target", "#new-widget-modal"), gr.Text("New Widget"))).Modify(dropdownMenu)     // New Widget
 	el.ListItem(el.Anchor(gr.Data("toggle", "modal"), gr.Data("target", "#edit-widgets-modal"), gr.Text("Edit Widgets"))).Modify(dropdownMenu) // Edit Widgets
+
+	// New Widget
+	gr.New(&Modal{}).CreateElement(gr.Props{"id": "new-widget-modal", "title": "New " + pageType + " Widget"},
+		gr.New(&NewWidget{}).CreateElement(gr.Props{"apiType": apiType}),
+	).Modify(dropdown)
 
 	// Edit Widgets
 	gr.New(&Modal{}).CreateElement(gr.Props{"id": "edit-widgets-modal", "title": "Edit " + pageType + " Widgets"},

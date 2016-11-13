@@ -118,8 +118,8 @@ func (k KeyPairClassForm) BuildClassForm(className string, optionsResp interface
 
 	classEditForm := el.Form()
 
-	textField("Description", "description", state.String("description"), k.storeValue).Modify(classEditForm)
-	textArea("Public Key", "publicKey", state.String("publicKey"), k.storeValue).Modify(classEditForm)
+	TextField("Description", "description", state.String("description"), k.storeValue).Modify(classEditForm)
+	TextArea("Public Key", "publicKey", state.String("publicKey"), k.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

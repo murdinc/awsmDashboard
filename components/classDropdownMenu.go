@@ -49,14 +49,14 @@ func (d ClassDropdownMenu) Render() gr.Component {
 	   	).Modify(dropdown)
 	*/
 
-	// Edit Class
-	gr.New(&Modal{}).CreateElement(gr.Props{"id": "edit-class-modal", "title": "Edit " + pageType + " Classes"},
-		gr.New(&EditClass{}).CreateElement(gr.Props{"apiType": apiType}),
-	).Modify(dropdown)
-
 	// New Class
 	gr.New(&Modal{}).CreateElement(gr.Props{"id": "new-class-modal", "title": "New " + pageType + " Class"},
 		gr.New(&NewClass{}).CreateElement(gr.Props{"apiType": apiType}),
+	).Modify(dropdown)
+
+	// Edit Class
+	gr.New(&Modal{}).CreateElement(gr.Props{"id": "edit-class-modal", "title": "Edit " + pageType + " Classes"},
+		gr.New(&EditClass{}).CreateElement(gr.Props{"apiType": apiType}),
 	).Modify(dropdown)
 
 	dropdownMenu.Modify(dropdown)

@@ -119,14 +119,14 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 
 	classEditForm := el.Form()
 
-	textField("Instance ID", "instanceID", state.String("instanceID"), i.storeValue).Modify(classEditForm) // select one?
-	checkbox("Propagate", "propagate", state.Bool("propagate"), i.storeValue).Modify(classEditForm)
+	TextField("Instance ID", "instanceID", state.String("instanceID"), i.storeValue).Modify(classEditForm) // select one?
+	Checkbox("Propagate", "propagate", state.Bool("propagate"), i.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
-		selectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), i.storeSelect).Modify(classEditForm)
+		SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), i.storeSelect).Modify(classEditForm)
 	}
-	checkbox("Rotate", "rotate", state.Bool("rotate"), i.storeValue).Modify(classEditForm)
+	Checkbox("Rotate", "rotate", state.Bool("rotate"), i.storeValue).Modify(classEditForm)
 	if state.Bool("rotate") {
-		numberField("Retain", "retain", state.Int("retain"), i.storeValue).Modify(classEditForm)
+		NumberField("Retain", "retain", state.Int("retain"), i.storeValue).Modify(classEditForm)
 	}
 
 	classEditForm.Modify(classEdit)

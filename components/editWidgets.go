@@ -48,7 +48,7 @@ func (e EditWidgets) Render() gr.Component {
 			// STEP 1
 
 			if widgets := state.Interface("widgetList"); widgets != nil {
-				widgetList := ClassListBuilder(widgets, e.selectWidget) // Build the widget list
+				widgetList := WidgetListBuilder(widgets, e.selectWidget) // Build the widget list
 				widgetList.Modify(response)
 			} else {
 
@@ -73,12 +73,12 @@ func (e EditWidgets) Render() gr.Component {
 
 			// STEP 2
 
-			widgetForm, widgetJson := EditClassFormBuilder(state.Interface("widgetData").([]byte))
+			widgetForm, widgetJson := EditWidgetFormBuilder(state.Interface("widgetData").([]byte))
 
 			widgetForm.CreateElement(
 				gr.Props{
-					"widgetName":    widgetJson.S("widgetName").Data().(string),
-					"widget":        widgetJson.S("widget").Bytes(),
+					"widgetName":    e.State().String("selectedWidget"),
+					"widget":        widgetJson.Bytes(),
 					"backButton":    e.stepTwoBack,
 					"apiType":       props.String("apiType"),
 					"hasDelete":     true,
@@ -95,7 +95,7 @@ func (e EditWidgets) getWidgetsList() {
 	go func() {
 		if apiType := e.Props().String("apiType"); apiType != "" {
 			e.SetState(gr.State{"querying": true})
-			endpoint := "//localhost:8081/api/" + apiType + "/widgets/options"
+			endpoint := "//localhost:8081/api/" + apiType + "/widgets"
 			resp, err := helpers.GetAPI(endpoint)
 			if !e.IsMounted() {
 				return
@@ -120,22 +120,15 @@ func (e EditWidgets) getWidgetsList() {
 }
 
 func (e *EditWidgets) selectWidget(name string) {
+	state := e.State()
+
 	e.SetState(gr.State{"querying": true})
-	go func() {
-		if apiType := e.Props().String("apiType"); apiType != "" {
-			endpoint := "//localhost:8081/api/widgets/" + apiType + "/name/" + name
-			resp, err := helpers.GetAPI(endpoint)
-			if !e.IsMounted() {
-				return
-			}
-			if err != nil {
-				e.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
-				return
-			}
-			e.SetState(gr.State{"widgetData": resp})
-		}
-		e.SetState(gr.State{"querying": false, "step": 2, "selectedWidget": name})
-	}()
+
+	if wl := state.Interface("widgetList"); wl != nil {
+		widgetList, _ := gabs.ParseJSON(wl.([]byte))
+		widgetData := widgetList.S("widgets").S(name).Bytes()
+		e.SetState(gr.State{"querying": false, "step": 2, "selectedWidget": name, "widgetData": widgetData})
+	}
 }
 
 func (e EditWidgets) stepTwoBack() {

@@ -203,7 +203,7 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 
 	classEditForm := el.Form()
 
-	textField("Description", "description", state.String("description"), s.storeValue).Modify(classEditForm)
+	TextField("Description", "description", state.String("description"), s.storeValue).Modify(classEditForm)
 
 	el.Div(
 		el.Break(nil),
@@ -236,27 +236,27 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 			// Form placeholder
 			grantForm := el.Div()
 
-			textField("Note", "note", grant["note"], s.modifyGrant(index, grant)).Modify(grantForm)
+			TextField("Note", "note", grant["note"], s.modifyGrant(index, grant)).Modify(grantForm)
 
 			el.Div(
 				gr.CSS("row"), el.Div(gr.CSS("col-sm-3"),
-					selectOne("Type", "type", []string{"ingress", "egress"}, grant["type"], s.storeSelect(index, grant)),
+					SelectOne("Type", "type", []string{"ingress", "egress"}, grant["type"], s.storeSelect(index, grant)),
 				),
 				el.Div(gr.CSS("col-sm-3"),
-					numberField("From Port", "fromPort", grant["fromPort"], s.modifyGrant(index, grant)),
+					NumberField("From Port", "fromPort", grant["fromPort"], s.modifyGrant(index, grant)),
 				),
 				el.Div(gr.CSS("col-sm-3"),
-					numberField("To Port", "toPort", grant["toPort"], s.modifyGrant(index, grant)),
+					NumberField("To Port", "toPort", grant["toPort"], s.modifyGrant(index, grant)),
 				),
 				el.Div(gr.CSS("col-sm-3"),
-					selectOne("IP Protocol", "ipProtocol", []string{"tcp", "udp", "icmp"}, grant["ipProtocol"], s.storeSelect(index, grant)),
+					SelectOne("IP Protocol", "ipProtocol", []string{"tcp", "udp", "icmp"}, grant["ipProtocol"], s.storeSelect(index, grant)),
 				),
 			).Modify(grantForm)
 
 			el.Div(
 				gr.CSS("row"),
 				el.Div(gr.CSS("col-sm-12"),
-					createableSelectMultiple("CIDR IP's", "cidrIP", []string{ /* TODO */ }, grant["cidrIP"], s.storeSelect(index, grant)),
+					CreateableSelectMultiple("CIDR IP's", "cidrIP", []string{ /* TODO */ }, grant["cidrIP"], s.storeSelect(index, grant)),
 				),
 			).Modify(grantForm)
 

@@ -3,9 +3,6 @@ package components
 import (
 	"github.com/Jeffail/gabs"
 	"github.com/bep/gr"
-	"github.com/bep/gr/attr"
-	"github.com/bep/gr/el"
-	"github.com/murdinc/awsm/config"
 	"github.com/murdinc/awsmDashboard/components/forms"
 )
 
@@ -124,37 +121,4 @@ func NewClassFormBuilder(classType string) *gr.ReactComponent {
 	}
 
 	return nil
-}
-
-func BuildClassForm(className string, cType interface{}) *gr.Element {
-
-	keys, values := config.ExtractAwsmClass(cType)
-
-	classEdit := el.Div(
-		el.Header3(gr.Text(className)),
-		el.HorizontalRule(),
-	)
-
-	classEditForm := el.Form()
-
-	for i, key := range keys {
-
-		el.Div(
-			gr.CSS("form-group"),
-			el.Label(
-				gr.Text(key),
-			),
-			el.Input(
-				attr.Type(gr.Text(key)),
-				attr.ClassName("form-control"),
-				attr.ID(gr.Text(key)),
-				attr.Placeholder(key),
-				attr.DefaultValue(values[i]),
-			),
-		).Modify(classEditForm)
-	}
-
-	classEditForm.Modify(classEdit)
-	return classEdit
-
 }

@@ -122,10 +122,10 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 
 	classEditForm := el.Form()
 
-	selectOne("Scheme", "scheme", elbSchemes, state.Interface("scheme"), l.storeSelect).Modify(classEditForm)
-	selectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], state.Interface("securityGroups"), l.storeSelect).Modify(classEditForm)
-	selectMultiple("Subnets", "subnets", classOptions["subnets"], state.Interface("subnets"), l.storeSelect).Modify(classEditForm)
-	selectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], state.Interface("availabilityZones"), l.storeSelect).Modify(classEditForm)
+	SelectOne("Scheme", "scheme", elbSchemes, state.Interface("scheme"), l.storeSelect).Modify(classEditForm)
+	SelectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], state.Interface("securityGroups"), l.storeSelect).Modify(classEditForm)
+	SelectMultiple("Subnets", "subnets", classOptions["subnets"], state.Interface("subnets"), l.storeSelect).Modify(classEditForm)
+	SelectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], state.Interface("availabilityZones"), l.storeSelect).Modify(classEditForm)
 
 	el.Div(
 		el.Break(nil),
@@ -149,23 +149,23 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 		// Form placeholder
 		listenerForm := el.Div()
 
-		//textField("Note", "note", listener["note"], l.modifyListener(index, listener)).Modify(listenerForm)
+		//TextField("Note", "note", listener["note"], l.modifyListener(index, listener)).Modify(listenerForm)
 
 		el.Div(
 			gr.CSS("row"), el.Div(gr.CSS("col-sm-6"),
-				selectOne("Protocol", "protocol", []string{"tcp", "udp", "icmp"}, listener["protocol"], l.storeListenerSelect(index, listener)),
+				SelectOne("Protocol", "protocol", []string{"tcp", "udp", "icmp"}, listener["protocol"], l.storeListenerSelect(index, listener)),
 			),
 			el.Div(gr.CSS("col-sm-6"),
-				numberField("Load Balancer Port", "loadBalancerPort", listener["loadBalancerPort"], l.modifyListener(index, listener)),
+				NumberField("Load Balancer Port", "loadBalancerPort", listener["loadBalancerPort"], l.modifyListener(index, listener)),
 			),
 		).Modify(listenerForm)
 
 		el.Div(
 			gr.CSS("row"), el.Div(gr.CSS("col-sm-6"),
-				selectOne("Instance Protocol", "instanceProtocol", []string{"tcp", "udp", "icmp"}, listener["instanceProtocol"], l.storeListenerSelect(index, listener)),
+				SelectOne("Instance Protocol", "instanceProtocol", []string{"tcp", "udp", "icmp"}, listener["instanceProtocol"], l.storeListenerSelect(index, listener)),
 			),
 			el.Div(gr.CSS("col-sm-6"),
-				numberField("Instance Port", "instancePort", listener["instancePort"], l.modifyListener(index, listener)),
+				NumberField("Instance Port", "instancePort", listener["instancePort"], l.modifyListener(index, listener)),
 			),
 		).Modify(listenerForm)
 

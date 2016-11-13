@@ -12,7 +12,7 @@ var (
 	reactCreatableSelect = gr.FromGlobal("Select", "Creatable")
 )
 
-func textField(name, id string, v interface{}, storeFunc func(*gr.Event)) *gr.Element {
+func TextField(name, id string, v interface{}, storeFunc func(*gr.Event)) *gr.Element {
 
 	var value string
 
@@ -37,7 +37,7 @@ func textField(name, id string, v interface{}, storeFunc func(*gr.Event)) *gr.El
 	)
 }
 
-func numberField(name, id string, value interface{}, storeFunc func(*gr.Event)) *gr.Element {
+func NumberField(name, id string, value interface{}, storeFunc func(*gr.Event)) *gr.Element {
 
 	return el.Div(
 		gr.CSS("form-group"),
@@ -55,7 +55,7 @@ func numberField(name, id string, value interface{}, storeFunc func(*gr.Event)) 
 	)
 }
 
-func textArea(name, id string, value string, storeFunc func(*gr.Event)) *gr.Element {
+func TextArea(name, id string, value string, storeFunc func(*gr.Event)) *gr.Element {
 	return el.Div(
 		gr.CSS("form-group"),
 		el.Label(
@@ -72,7 +72,7 @@ func textArea(name, id string, value string, storeFunc func(*gr.Event)) *gr.Elem
 	)
 }
 
-func checkbox(name, id string, value bool, storeFunc func(*gr.Event)) *gr.Element {
+func Checkbox(name, id string, value bool, storeFunc func(*gr.Event)) *gr.Element {
 
 	label := "disabled"
 	var checked gr.Modifier
@@ -102,7 +102,7 @@ func checkbox(name, id string, value bool, storeFunc func(*gr.Event)) *gr.Elemen
 	)
 }
 
-func selectOne(name, id string, options []string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
+func SelectOne(name, id string, options []string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
 	opts := make([]interface{}, len(options))
 	for i, option := range options {
 		opts[i] = map[string]string{
@@ -134,7 +134,7 @@ func selectOne(name, id string, options []string, value interface{}, storeSelect
 	)
 }
 
-func selectMultiple(name, id string, options []string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
+func SelectMultiple(name, id string, options []string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
 	opts := make([]interface{}, len(options))
 	for i, option := range options {
 		opts[i] = map[string]string{
@@ -165,7 +165,7 @@ func selectMultiple(name, id string, options []string, value interface{}, storeS
 	)
 }
 
-func createableSelectMultiple(name, id string, options []string, s interface{}, storeSelect func(string, interface{})) *gr.Element {
+func CreateableSelectMultiple(name, id string, options []string, s interface{}, storeSelect func(string, interface{})) *gr.Element {
 
 	var selected []interface{}
 	selectedSlice, ok := s.([]interface{})

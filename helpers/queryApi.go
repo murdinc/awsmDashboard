@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -28,7 +29,12 @@ func GetAPI(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("Error fetching data!")
+	}
 
 	return ioutil.ReadAll(resp.Body)
 }

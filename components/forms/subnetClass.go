@@ -118,7 +118,7 @@ func (s SubnetClassForm) BuildClassForm(className string, optionsResp interface{
 
 	classEditForm := el.Form()
 
-	textField("CIDR", "cidr", state.String("cidr"), s.storeValue).Modify(classEditForm)
+	TextField("CIDR", "cidr", state.String("cidr"), s.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

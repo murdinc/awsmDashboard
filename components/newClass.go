@@ -8,6 +8,7 @@ import (
 	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
 	"github.com/bep/gr/evt"
+	"github.com/murdinc/awsmDashboard/components/forms"
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
@@ -35,39 +36,36 @@ func (n NewClass) Render() gr.Component {
 
 		// STEP 1
 
-		form := el.Form(
-			el.Div(
-				gr.CSS("form-group"),
-				el.Label(
-					gr.Text("Name"),
-				),
-				el.Input(
-					attr.ClassName("form-control"),
-					attr.ID("className"),
-					attr.Placeholder("Class Name"),
-					attr.Value(state.String("className")),
-					evt.Change(n.storeValue),
-				),
-			),
-			el.Button(
-				evt.Click(n.stepOneNext).PreventDefault(),
-				gr.CSS("btn", "btn-primary"),
-				gr.Text("Next"),
-			),
-			el.Button(
-				evt.Click(n.closeButton).PreventDefault(),
-				gr.CSS("btn", "btn-secondary"),
-				gr.Text("Close"),
-			),
+		newClassForm := el.Form()
+
+		forms.TextField("Name", "className", state.String("className"), n.storeValue).Modify(newClassForm)
+
+		buttons := el.Div(
+			gr.CSS("btn-toolbar"),
 		)
+
+		// Next
+		el.Button(
+			evt.Click(n.stepOneNext).PreventDefault(),
+			gr.CSS("btn", "btn-primary"),
+			gr.Text("Next"),
+		).Modify(buttons)
+
+		// Close
+		el.Button(
+			evt.Click(n.closeButton).PreventDefault(),
+			gr.CSS("btn", "btn-secondary"),
+			gr.Text("Close"),
+		).Modify(buttons)
 
 		// Disables the form while querying
 		// but does it work?
 		if state.Bool("querying") {
-			attr.Disabled("").Modify(form)
+			attr.Disabled("").Modify(newClassForm)
 		}
 
-		form.Modify(response)
+		newClassForm.Modify(response)
+		buttons.Modify(response)
 
 	} else if state.Int("step") == 2 {
 
@@ -85,50 +83,6 @@ func (n NewClass) Render() gr.Component {
 	}
 
 	return response
-}
-
-func (n NewClass) checkClassName(className string) {
-	n.SetState(gr.State{"querying": true, "error": ""})
-
-	go func() {
-
-		// Make sure the classname isn't empty
-		if className == "" {
-			n.SetState(gr.State{"error": "Class name cannot be empty", "querying": false})
-			return
-		}
-
-		// Make sure the classname doesn't include any numbers
-		for _, char := range className {
-			if char >= '0' && char <= '9' {
-				n.SetState(gr.State{"error": "Class name cannot contain numbers", "querying": false})
-				return
-			}
-		}
-
-		// Make sure this class name doesn't already exist
-		if apiType := n.Props().String("apiType"); apiType != "" {
-			endpoint := "//localhost:8081/api/classes/" + apiType + "/name/" + className
-			resp, err := helpers.GetAPI(endpoint)
-
-			if err != nil {
-				n.SetState(gr.State{"error": fmt.Sprintf("Error while querying endpoint: %s", endpoint), "querying": false})
-				return
-			}
-
-			jsonParsed, _ := gabs.ParseJSON(resp)
-			exists := jsonParsed.S("success").Data().(bool)
-
-			if exists {
-				n.SetState(gr.State{"error": "Class name " + className + " already exists!", "querying": false})
-				return
-			}
-		} else {
-			n.SetState(gr.State{"error": "No API type, unable to query API", "querying": false})
-			return
-		}
-		n.SetState(gr.State{"error": "", "querying": false, "step": 2})
-	}()
 }
 
 func (n NewClass) storeValue(event *gr.Event) {

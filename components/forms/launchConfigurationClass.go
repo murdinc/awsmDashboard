@@ -118,13 +118,13 @@ func (l LaunchConfigurationClassForm) BuildClassForm(className string, optionsRe
 	classOptionsJson := jsonParsed.S("classOptions").Bytes()
 	json.Unmarshal(classOptionsJson, &classOptions)
 
-	numberField("Version", "version", state.Int("version"), l.storeValue).Modify(classEditForm)
-	selectOne("Instance Class", "instanceClass", classOptions["instances"], state.Interface("instanceClass"), l.storeSelect).Modify(classEditForm)
-	checkbox("Rotate", "rotate", state.Bool("rotate"), l.storeValue).Modify(classEditForm)
+	NumberField("Version", "version", state.Int("version"), l.storeValue).Modify(classEditForm)
+	SelectOne("Instance Class", "instanceClass", classOptions["instances"], state.Interface("instanceClass"), l.storeSelect).Modify(classEditForm)
+	Checkbox("Rotate", "rotate", state.Bool("rotate"), l.storeValue).Modify(classEditForm)
 	if state.Bool("rotate") {
-		numberField("Retain", "retain", state.Int("retain"), l.storeValue).Modify(classEditForm)
+		NumberField("Retain", "retain", state.Int("retain"), l.storeValue).Modify(classEditForm)
 	}
-	selectMultiple("Regions", "regions", classOptions["regions"], state.Interface("regions"), l.storeSelect).Modify(classEditForm)
+	SelectMultiple("Regions", "regions", classOptions["regions"], state.Interface("regions"), l.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

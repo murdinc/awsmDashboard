@@ -120,10 +120,10 @@ func (s ScalingPolicyClassForm) BuildClassForm(className string, optionsResp int
 
 	classEditForm := el.Form()
 
-	numberField("Scaling Adjustment", "scalingAdjustment", state.Int("scalingAdjustment"), s.storeValue).Modify(classEditForm)
-	selectOne("Adjustment Type", "adjustmentType", adjustmentTypes, state.Interface("adjustmentType"), s.storeSelect).Modify(classEditForm)
-	numberField("Cooldown", "cooldown", state.Int("cooldown"), s.storeValue).Modify(classEditForm)
-	selectMultiple("Alarms", "alarms", classOptions["keypairs"], state.Interface("alarms"), s.storeSelect)
+	NumberField("Scaling Adjustment", "scalingAdjustment", state.Int("scalingAdjustment"), s.storeValue).Modify(classEditForm)
+	SelectOne("Adjustment Type", "adjustmentType", adjustmentTypes, state.Interface("adjustmentType"), s.storeSelect).Modify(classEditForm)
+	NumberField("Cooldown", "cooldown", state.Int("cooldown"), s.storeValue).Modify(classEditForm)
+	SelectMultiple("Alarms", "alarms", classOptions["keypairs"], state.Interface("alarms"), s.storeSelect)
 
 	classEditForm.Modify(classEdit)
 

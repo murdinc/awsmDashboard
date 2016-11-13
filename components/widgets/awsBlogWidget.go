@@ -11,58 +11,58 @@ import (
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
-type EventsWidget struct {
+type AwsBlogWidget struct {
 	*gr.This
 }
 
 // Implements the StateInitializer interface
-func (e EventsWidget) GetInitialState() gr.State {
+func (a AwsBlogWidget) GetInitialState() gr.State {
 	return gr.State{"querying": true, "error": "", "success": ""}
 }
 
 // Implements the ComponentWillMount interface
-func (e EventsWidget) ComponentWillMount() {
+func (a AwsBlogWidget) ComponentWillMount() {
 	var class map[string]interface{}
 
-	if e.Props().Interface("class") != nil {
-		classJson := e.Props().Interface("class").([]byte)
+	if a.Props().Interface("class") != nil {
+		classJson := a.Props().Interface("class").([]byte)
 		json.Unmarshal(classJson, &class)
 	}
 
-	e.SetState(class)
-	e.SetState(gr.State{"querying": true})
+	a.SetState(class)
+	a.SetState(gr.State{"querying": true})
 
 	// Get our options for the form
 	go func() {
-		endpoint := "//localhost:8081/api/dashboard/widgets/events"
+		endpoint := "//localhost:8081/api/dashboard/widgets/awsblog"
 		resp, err := helpers.GetAPI(endpoint)
-		if !e.IsMounted() {
+		if !a.IsMounted() {
 			return
 		}
 		if err != nil {
-			e.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			a.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
 			return
 		}
 
 		jsonParsed, _ := gabs.ParseJSON(resp)
 		success, ok := jsonParsed.S("success").Data().(bool)
 		if !ok || !success {
-			e.SetState(gr.State{"querying": false, "error": "Error while processing API response"})
+			a.SetState(gr.State{"querying": false, "error": "Error while processing API response"})
 			return
 		}
 
-		e.SetState(gr.State{"eventsList": resp, "querying": false})
+		a.SetState(gr.State{"itemsList": resp, "querying": false})
 	}()
 }
 
-func (e EventsWidget) Render() gr.Component {
+func (a AwsBlogWidget) Render() gr.Component {
 
-	state := e.State()
-	//props := e.Props()
+	state := a.State()
+	//props := a.Props()
 
 	// Widget placeholder
 	response := el.Div(gr.CSS("panel", "widget"))
-	el.Div(gr.CSS("panel-heading"), gr.Text("AWS Events")).Modify(response)
+	el.Div(gr.CSS("panel-heading"), gr.Text("AWS Blog")).Modify(response)
 	widget := el.Div(gr.CSS("panel-body"))
 
 	// Print any alerts
@@ -73,46 +73,43 @@ func (e EventsWidget) Render() gr.Component {
 		return response
 	}
 
-	var events []models.Event
-	eventsList, ok := state.Interface("eventsList").([]byte)
+	var items []models.FeedItem
+	itemsList, ok := state.Interface("itemsList").([]byte)
 	if !ok {
 		return response
 	}
 
-	jsonParsed, _ := gabs.ParseJSON(eventsList)
-	eventsJson := jsonParsed.S("events").Bytes()
-	json.Unmarshal(eventsJson, &events)
+	jsonParsed, _ := gabs.ParseJSON(itemsList)
+	itemsJson := jsonParsed.S("blogPosts").Bytes()
+	err := json.Unmarshal(itemsJson, &items)
+	if err != nil {
+		println(err.Error())
+	}
 
-	if len(events) < 1 {
+	if len(items) < 1 {
 		gr.Text("Nothing here!").Modify(response)
 		return response
 	}
-	e.BuildEventsTable(events).Modify(widget)
+
+	a.BuildItemsTable(items).Modify(widget)
 
 	widget.Modify(response)
 	return response
 }
 
-func (e EventsWidget) BuildEventsTable(events []models.Event) *gr.Element {
+func (a AwsBlogWidget) BuildItemsTable(items []models.FeedItem) *gr.Element {
 	count := 0
-	maxArchive := 10
+	maxItems := 10
 
 	response := el.Div()
 
 	var header []string
-	rows := make([][]string, len(events))
+	rows := make([][]string, len(items))
 
-Loop:
-	for i, event := range events {
-		if count >= maxArchive {
-			break Loop
-		}
-
-		models.ExtractAwsmTable(i, event, &header, &rows)
-		if event.Archive {
+	for i, item := range items {
+		if count < maxItems {
+			models.ExtractAwsmTable(i, item, &header, &rows)
 			count++
-		} else {
-			maxArchive--
 		}
 	}
 
@@ -126,6 +123,7 @@ Loop:
 		el.TableHead(el.TableRow(helpers.BuildTableHeader(header)...)))
 
 	if count < 1 {
+		gr.Text("Nothing here!").Modify(response)
 		return response
 	}
 

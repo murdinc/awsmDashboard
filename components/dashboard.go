@@ -1,11 +1,14 @@
 package components
 
 import (
+	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/Jeffail/gabs"
 	"github.com/bep/gr"
 	"github.com/bep/gr/el"
+	"github.com/murdinc/awsm/config"
 	"github.com/murdinc/awsmDashboard/components/widgets"
 	"github.com/murdinc/awsmDashboard/helpers"
 )
@@ -73,32 +76,49 @@ func WidgetsBuilder(wl interface{}) *gr.Element {
 	widgetList := wl.([]byte)
 
 	jsonParsed, _ := gabs.ParseJSON(widgetList)
-	widgetsJson, _ := jsonParsed.S("widgets").ChildrenMap()
+	widgetsJson := jsonParsed.S("widgets").Bytes()
 
-	if len(widgetsJson) < 1 {
+	var widgetMap (config.Widgets)
+
+	err := json.Unmarshal(widgetsJson, &widgetMap)
+	if err != nil {
+		return el.Div(gr.Text(err.Error()))
+	}
+
+	count := len(widgetMap)
+	if count < 1 {
 		return el.Div(gr.Text("Nothing here!"))
 	}
 
+	// Put it into a slice so we can sort it by the Index
+	i := 0
+	widgetSlice := make(config.WidgetSlice, count)
+	for widgetName, widget := range widgetMap {
+		widgetSlice[i] = widget
+		widgetSlice[i].Name = widgetName
+		i++
+	}
+	sort.Sort(widgetSlice)
+
 	response := el.Div()
 
-	for widgetName, w := range widgetsJson {
-		widget := w.Data().(map[string]interface{})
+	for _, widget := range widgetSlice {
 
-		if widget["enabled"].(bool) == true {
+		if widget.Enabled == true {
 
-			switch widgetName {
+			switch widget.WidgetType {
 			case "events":
 				gr.New(&widgets.EventsWidget{}).CreateElement(gr.Props{}).Modify(response)
 
-			case "securitybulletins":
-				gr.New(&widgets.SecurityBulletinsWidget{}).CreateElement(gr.Props{}).Modify(response)
+			case "rss":
+				gr.New(&widgets.RSSWidget{}).CreateElement(gr.Props{"title": widget.Title, "name": widget.Name}).Modify(response)
 
 			case "alarms":
 				el.Div(gr.Text("Alarms Widget goes here!")).Modify(response)
 
 			default:
 				println("WidgetsBuilder does not have a switch for widget:")
-				println(widgetName)
+				println(widget.WidgetType)
 			}
 
 		}

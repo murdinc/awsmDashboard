@@ -1,23 +1,40 @@
 package helpers
 
 import (
-	"github.com/asaskevich/govalidator"
 	"github.com/bep/gr"
 	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
 )
+
+func BuildTableRowsLinks(header []string, rows [][]string, links []map[string]string, tBody *gr.Element) {
+	for i, row := range rows {
+		var rowEls = make([]gr.Modifier, len(row))
+
+		for ri, rowName := range row {
+			if links[i][header[ri]] != "" {
+				rowEls[ri] = el.TableData(
+					el.Anchor(
+						attr.HRef(links[i][header[ri]]),
+						attr.Target("_blank"),
+						gr.Text(rowName),
+					),
+				)
+			} else {
+				rowEls[ri] = el.TableData(gr.Text(rowName))
+			}
+		}
+
+		tr := el.TableRow(rowEls...)
+		tr.Modify(tBody)
+	}
+}
 
 func BuildTableRows(rows [][]string, tBody *gr.Element) {
 	for _, row := range rows {
 		var rowEls = make([]gr.Modifier, len(row))
 
 		for ri, rowName := range row {
-
-			if govalidator.IsURL(rowName) {
-				rowEls[ri] = el.TableData(el.Anchor(attr.HRef(rowName), attr.Target("_blank"), gr.Text(rowName)))
-			} else {
-				rowEls[ri] = el.TableData(gr.Text(rowName))
-			}
+			rowEls[ri] = el.TableData(gr.Text(rowName))
 		}
 
 		tr := el.TableRow(rowEls...)
