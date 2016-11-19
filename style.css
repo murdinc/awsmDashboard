@@ -91,15 +91,22 @@ html,body {
 .nav-menu  li a:active,
 .nav-menu  li a:focus {
     text-decoration: none;
+    background-color: rgba(95,128,160,1);
 }
 
 .nav-menu  li a:hover {
     text-decoration: none;
-    background-color: rgba(174, 77, 210, 0.47);
+    /*background-color: rgba(95, 128, 160, 0.45);*/
+    background-color: rgba(95,128,160,1);
+
+    background: -moz-linear-gradient(-45deg, rgba(95,128,160,1) 0%, rgba(93,28,117,0.47) 47%, rgba(93,28,117,0) 89%, rgba(93,28,117,0) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(-45deg, rgba(95,128,160,1) 0%,rgba(93,28,117,0.47) 47%,rgba(93,28,117,0) 89%,rgba(93,28,117,0) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(135deg, rgba(95,128,160,1) 0%,rgba(93,28,117,0.47) 47%,rgba(93,28,117,0) 89%,rgba(93,28,117,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5f80a0', endColorstr='#005d1c75',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
 .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
-    background-color: rgba(226, 0, 177, 0.47);
+    background-color: rgba(95,128,160,1);
 }
 
 .content {
