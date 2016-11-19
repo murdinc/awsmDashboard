@@ -17,7 +17,7 @@ type ImageClassForm struct {
 
 // Implements the StateInitializer interface
 func (i ImageClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "", "step": 1,
+	return gr.State{"querying": true, "queryingOpts": true, "queryingInstances": true, "error": "", "success": "", "step": 1,
 		"propagate": false,
 		"rotate":    false,
 	}
@@ -33,7 +33,7 @@ func (i ImageClassForm) ComponentWillMount() {
 	}
 
 	i.SetState(class)
-	i.SetState(gr.State{"querying": true})
+	i.SetState(gr.State{"queryingOpts": true, "queryingInstances": true})
 
 	// Get our options for the form
 	go func() {
@@ -43,11 +43,26 @@ func (i ImageClassForm) ComponentWillMount() {
 			return
 		}
 		if err != nil {
-			i.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			i.SetState(gr.State{"queryingOpts": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
 			return
 		}
 
-		i.SetState(gr.State{"classOptionsResp": resp, "querying": false})
+		i.SetState(gr.State{"classOptionsResp": resp, "queryingOpts": false})
+	}()
+
+	// Get our existing instances for the form
+	go func() {
+		endpoint := "//localhost:8081/api/assets/instances"
+		resp, err := helpers.GetAPI(endpoint)
+		if !i.IsMounted() {
+			return
+		}
+		if err != nil {
+			i.SetState(gr.State{"queryingInstances": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			return
+		}
+
+		i.SetState(gr.State{"instanceOptionsResp": resp, "queryingInstances": false})
 	}()
 }
 
@@ -64,10 +79,10 @@ func (i ImageClassForm) Render() gr.Component {
 	helpers.SuccessElem(state.String("success")).Modify(response)
 
 	if state.Int("step") == 1 {
-		if state.Bool("querying") {
+		if state.Bool("queryingOpts") || state.Bool("queryingInstances") {
 			gr.Text("Loading...").Modify(response)
 		} else {
-			i.BuildClassForm(props.String("className"), state.Interface("classOptionsResp")).Modify(response)
+			i.BuildClassForm(props.String("className"), state.Interface("classOptionsResp"), state.Interface("instanceOptionsResp")).Modify(response)
 		}
 
 	} else if state.Int("step") == 2 {
@@ -102,7 +117,7 @@ func (i ImageClassForm) Render() gr.Component {
 	return response
 }
 
-func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}) *gr.Element {
+func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}, instanceResp interface{}) *gr.Element {
 
 	state := i.State()
 	props := i.Props()
@@ -112,6 +127,17 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 	classOptionsJson := jsonParsed.S("classOptions").Bytes()
 	json.Unmarshal(classOptionsJson, &classOptions)
 
+	instanceJsonParsed, _ := gabs.ParseJSON(instanceResp.([]byte))
+	instanceOptionsSlice, _ := instanceJsonParsed.S("assets").Children()
+
+	var instances []string
+	for _, iamOption := range instanceOptionsSlice {
+		instance := iamOption.S("instanceID").Data().(string)
+		if instance != "" {
+			instances = append(instances, instance)
+		}
+	}
+
 	classEdit := el.Div(
 		el.Header3(gr.Text(className)),
 		el.HorizontalRule(),
@@ -119,7 +145,7 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 
 	classEditForm := el.Form()
 
-	TextField("Instance ID", "instanceID", state.String("instanceID"), i.storeValue).Modify(classEditForm) // select one?
+	SelectOne("Instance", "instance", instances, state.Interface("instance"), i.storeSelect).Modify(classEditForm)
 	Checkbox("Propagate", "propagate", state.Bool("propagate"), i.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
 		SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), i.storeSelect).Modify(classEditForm)

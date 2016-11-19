@@ -17,7 +17,7 @@ type SnapshotClassForm struct {
 
 // Implements the StateInitializer interface
 func (s SnapshotClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "",
+	return gr.State{"querying": true, "queryingOpts": true, "queryingVolumes": true, "error": "", "success": "",
 		"rotate":    false,
 		"propagate": false,
 		"step":      1,
@@ -34,7 +34,7 @@ func (s SnapshotClassForm) ComponentWillMount() {
 	}
 
 	s.SetState(class)
-	s.SetState(gr.State{"querying": true})
+	s.SetState(gr.State{"queryingOpts": true, "queryingVolumes": true})
 
 	// Get our options for the form
 	go func() {
@@ -44,11 +44,26 @@ func (s SnapshotClassForm) ComponentWillMount() {
 			return
 		}
 		if err != nil {
-			s.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			s.SetState(gr.State{"queryingOpts": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
 			return
 		}
 
-		s.SetState(gr.State{"classOptionsResp": resp, "querying": false})
+		s.SetState(gr.State{"classOptionsResp": resp, "queryingOpts": false})
+	}()
+
+	// Get our existing instances for the form
+	go func() {
+		endpoint := "//localhost:8081/api/assets/volumes"
+		resp, err := helpers.GetAPI(endpoint)
+		if !s.IsMounted() {
+			return
+		}
+		if err != nil {
+			s.SetState(gr.State{"queryingVolumes": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			return
+		}
+
+		s.SetState(gr.State{"volumeOptionsResp": resp, "queryingVolumes": false})
 	}()
 }
 
@@ -65,10 +80,10 @@ func (s SnapshotClassForm) Render() gr.Component {
 	helpers.SuccessElem(state.String("success")).Modify(response)
 
 	if state.Int("step") == 1 {
-		if state.Bool("querying") {
+		if state.Bool("queryingOpts") || state.Bool("queryingVolumes") {
 			gr.Text("Loading...").Modify(response)
 		} else {
-			s.BuildClassForm(props.String("className"), state.Interface("classOptionsResp")).Modify(response)
+			s.BuildClassForm(props.String("className"), state.Interface("classOptionsResp"), state.Interface("volumeOptionsResp")).Modify(response)
 		}
 
 	} else if state.Int("step") == 2 {
@@ -103,7 +118,7 @@ func (s SnapshotClassForm) Render() gr.Component {
 	return response
 }
 
-func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interface{}) *gr.Element {
+func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interface{}, volumeResp interface{}) *gr.Element {
 
 	state := s.State()
 	props := s.Props()
@@ -112,6 +127,17 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 	jsonParsed, _ := gabs.ParseJSON(optionsResp.([]byte))
 	classOptionsJson := jsonParsed.S("classOptions").Bytes()
 	json.Unmarshal(classOptionsJson, &classOptions)
+
+	volumeJsonParsed, _ := gabs.ParseJSON(volumeResp.([]byte))
+	volumeOptionsSlice, _ := volumeJsonParsed.S("assets").Children()
+
+	var volumes []string
+	for _, volumeOption := range volumeOptionsSlice {
+		volume := volumeOption.S("volumeID").Data().(string)
+		if volume != "" {
+			volumes = append(volumes, volume)
+		}
+	}
 
 	classEdit := el.Div(
 		el.Header3(gr.Text(className)),
@@ -129,7 +155,7 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 		SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), s.storeSelect).Modify(classEditForm)
 	}
 
-	TextField("Volume ID", "volumeID", state.String("volumeID"), s.storeValue).Modify(classEditForm) // select one?
+	SelectOne("Volume", "volume", volumes, state.Interface("volume"), s.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

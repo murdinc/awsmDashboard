@@ -28,7 +28,7 @@ type InstanceClassForm struct {
 
 // Implements the StateInitializer interface
 func (i InstanceClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": true, "error": "", "success": "",
+	return gr.State{"querying": true, "queryingOpts": true, "queryingIams": true, "error": "", "success": "",
 		"monitoring":      false,
 		"publicIpAddress": false,
 		"ebsOptimized":    false,
@@ -46,7 +46,7 @@ func (i InstanceClassForm) ComponentWillMount() {
 	}
 
 	i.SetState(class)
-	i.SetState(gr.State{"querying": true})
+	i.SetState(gr.State{"queryingOpts": true, "queryingIams": true})
 
 	// Get our options for the form
 	go func() {
@@ -56,12 +56,28 @@ func (i InstanceClassForm) ComponentWillMount() {
 			return
 		}
 		if err != nil {
-			i.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			i.SetState(gr.State{"queryingOpts": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
 			return
 		}
 
-		i.SetState(gr.State{"classOptionsResp": resp, "querying": false})
+		i.SetState(gr.State{"classOptionsResp": resp, "queryingOpts": false})
 	}()
+
+	// Get our existing iam users for the form
+	go func() {
+		endpoint := "//localhost:8081/api/assets/iamusers"
+		resp, err := helpers.GetAPI(endpoint)
+		if !i.IsMounted() {
+			return
+		}
+		if err != nil {
+			i.SetState(gr.State{"queryingIams": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
+			return
+		}
+
+		i.SetState(gr.State{"iamOptionsResp": resp, "queryingIams": false})
+	}()
+
 }
 
 func (i InstanceClassForm) Render() gr.Component {
@@ -77,10 +93,10 @@ func (i InstanceClassForm) Render() gr.Component {
 	helpers.SuccessElem(state.String("success")).Modify(response)
 
 	if state.Int("step") == 1 {
-		if state.Bool("querying") {
+		if state.Bool("queryingOpts") || state.Bool("queryingIams") {
 			gr.Text("Loading...").Modify(response)
 		} else {
-			i.BuildClassForm(props.String("className"), state.Interface("classOptionsResp")).Modify(response)
+			i.BuildClassForm(props.String("className"), state.Interface("classOptionsResp"), state.Interface("iamOptionsResp")).Modify(response)
 		}
 
 	} else if state.Int("step") == 2 {
@@ -115,15 +131,23 @@ func (i InstanceClassForm) Render() gr.Component {
 	return response
 }
 
-func (i InstanceClassForm) BuildClassForm(className string, optionsResp interface{}) *gr.Element {
+func (i InstanceClassForm) BuildClassForm(className string, optionsResp interface{}, iamResp interface{}) *gr.Element {
 
 	state := i.State()
 	props := i.Props()
 
 	var classOptions map[string][]string
-	jsonParsed, _ := gabs.ParseJSON(optionsResp.([]byte))
-	classOptionsJson := jsonParsed.S("classOptions").Bytes()
+	classJsonParsed, _ := gabs.ParseJSON(optionsResp.([]byte))
+	classOptionsJson := classJsonParsed.S("classOptions").Bytes()
 	json.Unmarshal(classOptionsJson, &classOptions)
+
+	iamJsonParsed, _ := gabs.ParseJSON(iamResp.([]byte))
+	iamOptionsSlice, _ := iamJsonParsed.S("assets").Children()
+
+	var iamUsers []string
+	for _, iamOption := range iamOptionsSlice {
+		iamUsers = append(iamUsers, iamOption.S("userName").Data().(string))
+	}
 
 	classEdit := el.Div(
 		el.Header3(gr.Text(className)),
@@ -143,7 +167,7 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 	Checkbox("EBS Optimized", "ebsOptimized", state.Bool("ebsOptimized"), i.storeValue).Modify(classEditForm)
 	Checkbox("Monitoring", "monitoring", state.Bool("monitoring"), i.storeValue).Modify(classEditForm)
 	SelectOne("Shutdown Behavior", "shutdownBehavior", shutdownBehaviors, state.Interface("shutdownBehavior"), i.storeSelect).Modify(classEditForm)
-	SelectOne("IAM User", "iamUser", classOptions["iamusers"], state.Interface("iamUser"), i.storeSelect).Modify(classEditForm)
+	SelectOne("IAM User", "iamUser", iamUsers, state.Interface("iamUser"), i.storeSelect).Modify(classEditForm)
 	TextArea("User Data", "userData", state.String("userData"), i.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)

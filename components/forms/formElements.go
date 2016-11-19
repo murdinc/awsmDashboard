@@ -165,6 +165,56 @@ func SelectMultiple(name, id string, options []string, value interface{}, storeS
 	)
 }
 
+func CreateableSelect(name, id string, options []string, s interface{}, storeSelect func(string, interface{})) *gr.Element {
+
+	var selected []interface{}
+	selectedSlice, ok := s.([]interface{})
+	if ok {
+		selected = selectedSlice
+	}
+
+	opts := make([]interface{}, len(options))
+	for i, option := range options {
+		opts[i] = map[string]string{
+			"value": option,
+			"label": option,
+		}
+	}
+
+	// Creatable API seems to be a bit in limbo currently, so doing this to account for the experienced wonkiness
+	var value []interface{}
+	for _, sel := range selected {
+		selStr, ok := sel.(string)
+		if ok {
+			newVal := make(map[string]string)
+			newVal["value"] = selStr
+			newVal["label"] = selStr
+			value = append(value, newVal)
+		}
+	}
+
+	onChange := func(vals interface{}) {
+		storeSelect(id, vals)
+	}
+
+	reactSelectElem := reactCreatableSelect.CreateElement(gr.Props{
+		"name":               name,
+		"value":              value,
+		"options":            opts,
+		"onChange":           onChange,
+		"multi":              false,
+		"scrollMenuIntoView": false,
+	})
+
+	return el.Div(
+		gr.CSS("form-group"),
+		el.Label(
+			gr.Text(name),
+		),
+		reactSelectElem,
+	)
+}
+
 func CreateableSelectMultiple(name, id string, options []string, s interface{}, storeSelect func(string, interface{})) *gr.Element {
 
 	var selected []interface{}
