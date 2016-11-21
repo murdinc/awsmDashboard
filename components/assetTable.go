@@ -32,6 +32,10 @@ func (a AssetTable) Render() gr.Component {
 	if assets := a.State().Interface("assetList"); assets != nil {
 		table := AssetTableBuilder(assets) // Build the table
 		table.Modify(response)
+
+		el.Break().Modify(response)
+		el.HorizontalRule().Modify(response)
+
 	} else if a.State().Bool("querying") {
 		gr.Text("Loading...").Modify(response)
 	} else if errStr := a.State().String("error"); errStr != "" {
