@@ -45,18 +45,18 @@ func (n NewWidget) Render() gr.Component {
 			gr.CSS("btn-toolbar"),
 		)
 
-		// Next
-		el.Button(
-			evt.Click(n.stepOneNext).PreventDefault(),
-			gr.CSS("btn", "btn-primary"),
-			gr.Text("Next"),
-		).Modify(buttons)
-
 		// Close
 		el.Button(
 			evt.Click(n.closeButton).PreventDefault(),
 			gr.CSS("btn", "btn-secondary"),
 			gr.Text("Close"),
+		).Modify(buttons)
+
+		// Next
+		el.Button(
+			evt.Click(n.stepOneNext).PreventDefault(),
+			gr.CSS("btn", "btn-primary"),
+			gr.Text("Next"),
 		).Modify(buttons)
 
 		// Disables the form while querying

@@ -67,7 +67,7 @@ func TextArea(name, id string, value string, storeFunc func(*gr.Event)) *gr.Elem
 			attr.Placeholder(name),
 			evt.Change(storeFunc),
 			attr.Value(value),
-			attr.Rows(5),
+			attr.Rows(8),
 		),
 	)
 }
@@ -121,7 +121,85 @@ func SelectOne(name, id string, options []string, value interface{}, storeSelect
 		"value":              value,
 		"options":            opts,
 		"onChange":           onChange,
+		"clearable":          true,
+		"scrollMenuIntoView": false,
+	})
+
+	return el.Div(
+		gr.CSS("form-group"),
+		el.Label(
+			gr.Text(name),
+		),
+		reactSelectElem,
+	)
+}
+
+func SelectOneMeta(name, id string, options []string, optionsMeta map[string]string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
+	opts := make([]interface{}, len(options))
+	for i, option := range options {
+		opts[i] = map[string]string{
+			"value": option,
+			"label": option + " - " + optionsMeta[option],
+		}
+	}
+
+	onChange := func(vals interface{}) {
+		storeSelect(id, vals)
+	}
+
+	//reactSelect := gr.FromGlobal("Select")
+	reactSelectElem := reactSelect.CreateElement(gr.Props{
+		"name":               name,
+		"value":              value,
+		"options":            opts,
+		"onChange":           onChange,
 		"clearable":          false,
+		"scrollMenuIntoView": false,
+	})
+
+	return el.Div(
+		gr.CSS("form-group"),
+		el.Label(
+			gr.Text(name),
+		),
+		reactSelectElem,
+	)
+}
+
+func CreateableSelectMeta(name, id string, options []string, optionsMeta map[string]string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
+
+	selStr := value.(string)
+	existing := false
+
+	opts := make([]interface{}, len(options))
+	for i, option := range options {
+		opts[i] = map[string]string{
+			"value": option,
+			"label": option + " - " + optionsMeta[option],
+		}
+		if option == selStr {
+			existing = true
+		}
+	}
+
+	// Creatable API seems to be a bit in limbo currently, so doing this to account for the experienced wonkiness
+	if !existing {
+		newVal := make(map[string]string)
+		newVal["value"] = selStr
+		newVal["label"] = selStr
+		opts = append(opts, newVal)
+	}
+
+	onChange := func(vals interface{}) {
+		storeSelect(id, vals)
+	}
+
+	reactSelectElem := reactCreatableSelect.CreateElement(gr.Props{
+		"name":               name,
+		"value":              value,
+		"options":            opts,
+		"onChange":           onChange,
+		"multi":              false,
 		"scrollMenuIntoView": false,
 	})
 
@@ -153,56 +231,6 @@ func SelectMultiple(name, id string, options []string, value interface{}, storeS
 		"options":            opts,
 		"onChange":           onChange,
 		"multi":              true,
-		"scrollMenuIntoView": false,
-	})
-
-	return el.Div(
-		gr.CSS("form-group"),
-		el.Label(
-			gr.Text(name),
-		),
-		reactSelectElem,
-	)
-}
-
-func CreateableSelect(name, id string, options []string, s interface{}, storeSelect func(string, interface{})) *gr.Element {
-
-	var selected []interface{}
-	selectedSlice, ok := s.([]interface{})
-	if ok {
-		selected = selectedSlice
-	}
-
-	opts := make([]interface{}, len(options))
-	for i, option := range options {
-		opts[i] = map[string]string{
-			"value": option,
-			"label": option,
-		}
-	}
-
-	// Creatable API seems to be a bit in limbo currently, so doing this to account for the experienced wonkiness
-	var value []interface{}
-	for _, sel := range selected {
-		selStr, ok := sel.(string)
-		if ok {
-			newVal := make(map[string]string)
-			newVal["value"] = selStr
-			newVal["label"] = selStr
-			value = append(value, newVal)
-		}
-	}
-
-	onChange := func(vals interface{}) {
-		storeSelect(id, vals)
-	}
-
-	reactSelectElem := reactCreatableSelect.CreateElement(gr.Props{
-		"name":               name,
-		"value":              value,
-		"options":            opts,
-		"onChange":           onChange,
-		"multi":              false,
 		"scrollMenuIntoView": false,
 	})
 

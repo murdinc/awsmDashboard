@@ -131,10 +131,12 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 	instanceOptionsSlice, _ := instanceJsonParsed.S("assets").Children()
 
 	var instances []string
-	for _, iamOption := range instanceOptionsSlice {
-		instance := iamOption.S("instanceID").Data().(string)
+	instancesMeta := make(map[string]string)
+	for _, instanceOption := range instanceOptionsSlice {
+		instance := instanceOption.S("instanceID").Data().(string)
 		if instance != "" {
 			instances = append(instances, instance)
+			instancesMeta[instance] = instanceOption.S("name").Data().(string) + " " + instanceOption.S("availabilityZone").Data().(string)
 		}
 	}
 
@@ -145,7 +147,7 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 
 	classEditForm := el.Form()
 
-	SelectOne("Instance", "instance", instances, state.Interface("instance"), i.storeSelect).Modify(classEditForm)
+	CreateableSelectMeta("Instance", "instance", instances, instancesMeta, state.Interface("instance"), i.storeSelect).Modify(classEditForm)
 	Checkbox("Propagate", "propagate", state.Bool("propagate"), i.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
 		SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), i.storeSelect).Modify(classEditForm)

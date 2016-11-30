@@ -132,10 +132,12 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 	volumeOptionsSlice, _ := volumeJsonParsed.S("assets").Children()
 
 	var volumes []string
+	volumesMeta := make(map[string]string)
 	for _, volumeOption := range volumeOptionsSlice {
 		volume := volumeOption.S("volumeID").Data().(string)
 		if volume != "" {
 			volumes = append(volumes, volume)
+			volumesMeta[volume] = volumeOption.S("sizeHuman").Data().(string) + " " + volumeOption.S("name").Data().(string) + " " + volumeOption.S("attachment").Data().(string)
 		}
 	}
 
@@ -155,7 +157,7 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 		SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), s.storeSelect).Modify(classEditForm)
 	}
 
-	SelectOne("Volume", "volume", volumes, state.Interface("volume"), s.storeSelect).Modify(classEditForm)
+	SelectOneMeta("Volume", "volume", volumes, volumesMeta, state.Interface("volume"), s.storeSelect).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 

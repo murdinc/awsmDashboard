@@ -145,9 +145,14 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 	iamOptionsSlice, _ := iamJsonParsed.S("assets").Children()
 
 	var iamUsers []string
+	iamUsersMeta := make(map[string]string)
 	for _, iamOption := range iamOptionsSlice {
-		iamUsers = append(iamUsers, iamOption.S("userName").Data().(string))
+		userName := iamOption.S("userName").Data().(string)
+		iamUsers = append(iamUsers, userName)
+		iamUsersMeta[userName] = iamOption.S("userID").Data().(string)
 	}
+
+	println(iamUsersMeta)
 
 	classEdit := el.Div(
 		el.Header3(gr.Text(className)),
@@ -167,7 +172,7 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 	Checkbox("EBS Optimized", "ebsOptimized", state.Bool("ebsOptimized"), i.storeValue).Modify(classEditForm)
 	Checkbox("Monitoring", "monitoring", state.Bool("monitoring"), i.storeValue).Modify(classEditForm)
 	SelectOne("Shutdown Behavior", "shutdownBehavior", shutdownBehaviors, state.Interface("shutdownBehavior"), i.storeSelect).Modify(classEditForm)
-	SelectOne("IAM User", "iamUser", iamUsers, state.Interface("iamUser"), i.storeSelect).Modify(classEditForm)
+	SelectOneMeta("IAM User", "iamUser", iamUsers, iamUsersMeta, state.Interface("iamUser"), i.storeSelect).Modify(classEditForm)
 	TextArea("User Data", "userData", state.String("userData"), i.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
