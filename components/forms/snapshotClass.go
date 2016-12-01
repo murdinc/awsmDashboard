@@ -148,6 +148,8 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 
 	classEditForm := el.Form()
 
+	TextField("Description", "description", state.String("description"), s.storeValue).Modify(classEditForm)
+
 	Checkbox("Rotate", "rotate", state.Bool("rotate"), s.storeValue).Modify(classEditForm)
 	if state.Bool("rotate") {
 		NumberField("Retain", "retain", state.Int("retain"), s.storeValue).Modify(classEditForm)
