@@ -18,9 +18,12 @@ type SnapshotClassForm struct {
 // Implements the StateInitializer interface
 func (s SnapshotClassForm) GetInitialState() gr.State {
 	return gr.State{"querying": true, "queryingOpts": true, "queryingVolumes": true, "error": "", "success": "",
-		"rotate":    false,
-		"propagate": false,
-		"step":      1,
+		"description":      "",
+		"rotate":           false,
+		"propagate":        false,
+		"propagateRegions": []string{},
+		"step":             1,
+		"volume":           "",
 	}
 }
 
