@@ -153,7 +153,7 @@ func SelectOneMeta(name, id string, options []string, optionsMeta map[string]str
 		"value":              value,
 		"options":            opts,
 		"onChange":           onChange,
-		"clearable":          false,
+		"clearable":          true,
 		"scrollMenuIntoView": false,
 	})
 
