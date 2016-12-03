@@ -21,7 +21,10 @@ type SecurityGroupClassForm struct {
 
 // Implements the StateInitializer interface
 func (s SecurityGroupClassForm) GetInitialState() gr.State {
-	return gr.State{"querying": false, "error": "", "success": "", "step": 1}
+	return gr.State{"querying": false, "error": "", "success": "", "step": 1,
+		"classOptionsResp":    []interface{}{},
+		"securityGroupGrants": []interface{}{},
+	}
 }
 
 // Implements the ComponentWillMount interface
@@ -227,52 +230,56 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 		classOptionsJson := jsonParsed.S("classOptions").Bytes()
 		json.Unmarshal(classOptionsJson, &classOptions)
 
-		grants := state.Interface("securityGroupGrants").([]interface{})
+		grants, ok := state.Interface("securityGroupGrants").([]interface{})
 
-		for index, g := range grants {
+		if ok {
 
-			grant := g.(map[string]interface{})
+			for index, g := range grants {
 
-			// Form placeholder
-			grantForm := el.Div()
+				grant := g.(map[string]interface{})
 
-			TextField("Note", "note", grant["note"], s.modifyGrant(index, grant)).Modify(grantForm)
+				// Form placeholder
+				grantForm := el.Div()
 
-			el.Div(
-				gr.CSS("row"), el.Div(gr.CSS("col-sm-3"),
-					SelectOne("Type", "type", []string{"ingress", "egress"}, grant["type"], s.storeSelect(index, grant)),
-				),
-				el.Div(gr.CSS("col-sm-3"),
-					NumberField("From Port", "fromPort", grant["fromPort"], s.modifyGrant(index, grant)),
-				),
-				el.Div(gr.CSS("col-sm-3"),
-					NumberField("To Port", "toPort", grant["toPort"], s.modifyGrant(index, grant)),
-				),
-				el.Div(gr.CSS("col-sm-3"),
-					SelectOne("IP Protocol", "ipProtocol", []string{"tcp", "udp", "icmp"}, grant["ipProtocol"], s.storeSelect(index, grant)),
-				),
-			).Modify(grantForm)
+				TextField("Note", "note", grant["note"], s.modifyGrant(index, grant)).Modify(grantForm)
 
-			el.Div(
-				gr.CSS("row"),
-				el.Div(gr.CSS("col-sm-12"),
-					CreateableSelectMultiple("CIDR IP's", "cidrIP", []string{ /* TODO */ }, grant["cidrIP"], s.storeSelect(index, grant)),
-				),
-			).Modify(grantForm)
+				el.Div(
+					gr.CSS("row"), el.Div(gr.CSS("col-sm-3"),
+						SelectOne("Type", "type", []string{"ingress", "egress"}, grant["type"], s.storeSelect(index, grant)),
+					),
+					el.Div(gr.CSS("col-sm-3"),
+						NumberField("From Port", "fromPort", grant["fromPort"], s.modifyGrant(index, grant)),
+					),
+					el.Div(gr.CSS("col-sm-3"),
+						NumberField("To Port", "toPort", grant["toPort"], s.modifyGrant(index, grant)),
+					),
+					el.Div(gr.CSS("col-sm-3"),
+						SelectOne("IP Protocol", "ipProtocol", []string{"tcp", "udp", "icmp"}, grant["ipProtocol"], s.storeSelect(index, grant)),
+					),
+				).Modify(grantForm)
 
-			el.Div(
-				gr.CSS("btn-toolbar"),
-				el.Button(
-					evt.Click(s.removeGrant).PreventDefault(),
-					gr.CSS("btn", "btn-danger", "btn-sm", "pull-right"),
-					gr.Text("Remove"),
-					attr.ID(index),
-				),
-			).Modify(grantForm)
+				el.Div(
+					gr.CSS("row"),
+					el.Div(gr.CSS("col-sm-12"),
+						CreateableSelectMultiple("CIDR IP's", "cidrIP", []string{ /* TODO */ }, grant["cidrIP"], s.storeSelect(index, grant)),
+					),
+				).Modify(grantForm)
 
-			el.HorizontalRule(nil).Modify(grantForm)
+				el.Div(
+					gr.CSS("btn-toolbar"),
+					el.Button(
+						evt.Click(s.removeGrant).PreventDefault(),
+						gr.CSS("btn", "btn-danger", "btn-sm", "pull-right"),
+						gr.Text("Remove"),
+						attr.ID(index),
+					),
+				).Modify(grantForm)
 
-			grantForm.Modify(classEditForm)
+				el.HorizontalRule(nil).Modify(grantForm)
+
+				grantForm.Modify(classEditForm)
+
+			}
 
 		}
 
