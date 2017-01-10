@@ -15,9 +15,7 @@ import (
 func GetAPI(url string) ([]byte, error) {
 	println("Getting from: " + url)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	go func() {
-		cancel()
-	}()
+	defer cancel()
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

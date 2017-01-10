@@ -63,9 +63,9 @@ func (i InstanceClassForm) ComponentWillMount() {
 		i.SetState(gr.State{"classOptionsResp": resp, "queryingOpts": false})
 	}()
 
-	// Get our existing iam users for the form
+	// Get our existing iam instance profiles for the form
 	go func() {
-		endpoint := "//localhost:8081/api/assets/iamusers"
+		endpoint := "//localhost:8081/api/assets/iaminstanceprofiles"
 		resp, err := helpers.GetAPI(endpoint)
 		if !i.IsMounted() {
 			return
@@ -75,7 +75,7 @@ func (i InstanceClassForm) ComponentWillMount() {
 			return
 		}
 
-		i.SetState(gr.State{"iamOptionsResp": resp, "queryingIams": false})
+		i.SetState(gr.State{"iamInstanceProfilesResp": resp, "queryingIams": false})
 	}()
 
 }
@@ -96,7 +96,7 @@ func (i InstanceClassForm) Render() gr.Component {
 		if state.Bool("queryingOpts") || state.Bool("queryingIams") {
 			gr.Text("Loading...").Modify(response)
 		} else {
-			i.BuildClassForm(props.String("className"), state.Interface("classOptionsResp"), state.Interface("iamOptionsResp")).Modify(response)
+			i.BuildClassForm(props.String("className"), state.Interface("classOptionsResp"), state.Interface("iamInstanceProfilesResp")).Modify(response)
 		}
 
 	} else if state.Int("step") == 2 {
@@ -142,17 +142,15 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 	json.Unmarshal(classOptionsJson, &classOptions)
 
 	iamJsonParsed, _ := gabs.ParseJSON(iamResp.([]byte))
-	iamOptionsSlice, _ := iamJsonParsed.S("assets").Children()
+	iamInstanceProfilesSlice, _ := iamJsonParsed.S("assets").Children()
 
-	var iamUsers []string
-	iamUsersMeta := make(map[string]string)
-	for _, iamOption := range iamOptionsSlice {
-		userName := iamOption.S("userName").Data().(string)
-		iamUsers = append(iamUsers, userName)
-		iamUsersMeta[userName] = iamOption.S("userID").Data().(string)
+	var iamInstanceProfiles []string
+	iamInstanceProfilesMeta := make(map[string]string)
+	for _, iamProfile := range iamInstanceProfilesSlice {
+		userName := iamProfile.S("profileName").Data().(string)
+		iamInstanceProfiles = append(iamInstanceProfiles, userName)
+		iamInstanceProfilesMeta[userName] = iamProfile.S("profileID").Data().(string)
 	}
-
-	println(iamUsersMeta)
 
 	classEdit := el.Div(
 		el.Header3(gr.Text(className)),
@@ -172,7 +170,7 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 	Checkbox("EBS Optimized", "ebsOptimized", state.Bool("ebsOptimized"), i.storeValue).Modify(classEditForm)
 	Checkbox("Monitoring", "monitoring", state.Bool("monitoring"), i.storeValue).Modify(classEditForm)
 	SelectOne("Shutdown Behavior", "shutdownBehavior", shutdownBehaviors, state.Interface("shutdownBehavior"), i.storeSelect).Modify(classEditForm)
-	SelectOneMeta("IAM User", "iamUser", iamUsers, iamUsersMeta, state.Interface("iamUser"), i.storeSelect).Modify(classEditForm)
+	SelectOneMeta("IAM Instance Profile", "iamInstanceProfile", iamInstanceProfiles, iamInstanceProfilesMeta, state.Interface("iamInstanceProfile"), i.storeSelect).Modify(classEditForm)
 	TextArea("User Data", "userData", state.String("userData"), i.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
