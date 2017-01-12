@@ -14,7 +14,7 @@ import (
 
 func GetAPI(url string) ([]byte, error) {
 	println("Getting from: " + url)
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 6*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -39,10 +39,8 @@ func GetAPI(url string) ([]byte, error) {
 
 func PutAPI(url string, data map[string]interface{}) ([]byte, error) {
 	println("Posting to: " + url)
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	go func() {
-		cancel()
-	}()
+	ctx, cancel := context.WithTimeout(context.Background(), 6*time.Second)
+	defer cancel()
 
 	buf := new(bytes.Buffer)
 	if err := json.NewEncoder(buf).Encode(data); err != nil {
@@ -66,10 +64,8 @@ func PutAPI(url string, data map[string]interface{}) ([]byte, error) {
 
 func DeleteAPI(url string) ([]byte, error) {
 	println("Deleting: " + url)
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	go func() {
-		cancel()
-	}()
+	ctx, cancel := context.WithTimeout(context.Background(), 6*time.Second)
+	defer cancel()
 
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
