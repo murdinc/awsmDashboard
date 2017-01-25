@@ -83,6 +83,7 @@ func (e EditClass) Render() gr.Component {
 					"apiType":       props.String("apiType"),
 					"hasDelete":     true,
 					"hideAllModals": hideAllModals,
+					"editClass":     true,
 				},
 			).Modify(response)
 		}

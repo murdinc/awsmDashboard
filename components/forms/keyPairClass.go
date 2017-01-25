@@ -119,7 +119,20 @@ func (k KeyPairClassForm) BuildClassForm(className string, optionsResp interface
 	classEditForm := el.Form()
 
 	TextField("Description", "description", state.String("description"), k.storeValue).Modify(classEditForm)
+
+	if props.Interface("newClass") != nil && props.Bool("newClass") {
+		el.Div(
+			el.Break(nil),
+			gr.Text("Leave Key fields blank to generate a new key"),
+			el.HorizontalRule(nil),
+		).Modify(classEditForm)
+	}
+
 	TextArea("Public Key", "publicKey", state.String("publicKey"), k.storeValue).Modify(classEditForm)
+
+	if props.Interface("newClass") != nil && props.Bool("newClass") {
+		TextArea("Private Key", "privateKey", state.String("privateKey"), k.storeValue).Modify(classEditForm)
+	}
 
 	classEditForm.Modify(classEdit)
 
@@ -167,7 +180,24 @@ func (k KeyPairClassForm) doneButton(*gr.Event) {
 }
 
 func (k KeyPairClassForm) saveButton(*gr.Event) {
-	k.SetState(gr.State{"querying": true, "step": 2})
+	k.SetState(gr.State{"querying": true, "step": 2, "error": ""})
+
+	props := k.Props()
+	if props.Interface("newClass") != nil && props.Bool("newClass") {
+		// Validate key input
+		pubKey := k.State().String("privateKey")
+		privKey := k.State().String("publicKey")
+
+		if pubKey != "" && privKey == "" {
+			k.SetState(gr.State{"querying": false, "error": "Please enter a Public Key, or leave the Private Key blank.", "step": 1})
+			return
+		}
+
+		if pubKey == "" && privKey != "" {
+			k.SetState(gr.State{"querying": false, "error": "Please enter a Private Key, or leave the Public Key blank.", "step": 1})
+			return
+		}
+	}
 
 	cfg := make(map[string]interface{})
 	for key, _ := range k.State() {

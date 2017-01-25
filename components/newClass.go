@@ -78,6 +78,7 @@ func (n NewClass) Render() gr.Component {
 			"backButton":    n.stepTwoBack,
 			"apiType":       props.String("apiType"),
 			"hideAllModals": hideAllModals,
+			"newClass":      true,
 		}).Modify(response)
 
 	}
