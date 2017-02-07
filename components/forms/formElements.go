@@ -168,7 +168,10 @@ func SelectOneMeta(name, id string, options []string, optionsMeta map[string]str
 
 func CreateableSelectMeta(name, id string, options []string, optionsMeta map[string]string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
 
-	selStr := value.(string)
+	selStr, ok := value.(string)
+	if !ok {
+		selStr = ""
+	}
 	existing := false
 
 	opts := make([]interface{}, len(options))

@@ -20,6 +20,7 @@ func (i ImageClassForm) GetInitialState() gr.State {
 	return gr.State{"querying": true, "queryingOpts": true, "queryingInstances": true, "error": "", "success": "", "step": 1,
 		"propagate": false,
 		"rotate":    false,
+		"instance":  "",
 	}
 }
 
@@ -52,7 +53,7 @@ func (i ImageClassForm) ComponentWillMount() {
 
 	// Get our existing instances for the form
 	go func() {
-		endpoint := "//localhost:8081/api/assets/instances"
+		endpoint := "//localhost:8081/api/assets/instances-running"
 		resp, err := helpers.GetAPI(endpoint)
 		if !i.IsMounted() {
 			return
@@ -147,6 +148,7 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 
 	classEditForm := el.Form()
 
+	NumberField("Version", "version", state.Int("version"), i.storeValue).Modify(classEditForm)
 	CreateableSelectMeta("Instance", "instance", instances, instancesMeta, state.Interface("instance"), i.storeSelect).Modify(classEditForm)
 	Checkbox("Propagate", "propagate", state.Bool("propagate"), i.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {

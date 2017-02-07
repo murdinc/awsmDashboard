@@ -128,11 +128,12 @@ func (k KeyPairClassForm) BuildClassForm(className string, optionsResp interface
 		).Modify(classEditForm)
 	}
 
+	// TODO make these file uploads
 	TextArea("Public Key", "publicKey", state.String("publicKey"), k.storeValue).Modify(classEditForm)
 
-	if props.Interface("newClass") != nil && props.Bool("newClass") {
-		TextArea("Private Key", "privateKey", state.String("privateKey"), k.storeValue).Modify(classEditForm)
-	}
+	//if props.Interface("newClass") != nil && props.Bool("newClass") {
+	TextArea("Private Key", "privateKey", state.String("privateKey"), k.storeValue).Modify(classEditForm)
+	//}
 
 	classEditForm.Modify(classEdit)
 
