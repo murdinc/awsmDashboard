@@ -122,7 +122,7 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	SelectOne("Scheme", "scheme", elbSchemes, state.Interface("scheme"), l.storeSelect).Modify(classEditForm)
 	SelectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], state.Interface("securityGroups"), l.storeSelect).Modify(classEditForm)

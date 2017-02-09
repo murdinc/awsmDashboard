@@ -118,7 +118,7 @@ func (s ScalingPolicyClassForm) BuildClassForm(className string, optionsResp int
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	NumberField("Scaling Adjustment", "scalingAdjustment", state.Int("scalingAdjustment"), s.storeValue).Modify(classEditForm)
 	SelectOne("Adjustment Type", "adjustmentType", adjustmentTypes, state.Interface("adjustmentType"), s.storeSelect).Modify(classEditForm)

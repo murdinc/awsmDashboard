@@ -295,3 +295,24 @@ func CreateableSelectMultiple(name, id string, options []string, s interface{}, 
 		reactSelectElem,
 	)
 }
+
+func DisableEnter(event *gr.Event) {
+	key := event.Get("key").String()
+	keyCode := event.Get("keyCode").String()
+
+	if keyCode == "13" || key == "Enter" || key == "Return" {
+		event.Object.Call("preventDefault")
+	}
+}
+
+func CaptureEnter(callback func(*gr.Event)) func(*gr.Event) {
+	return func(event *gr.Event) {
+		key := event.Get("key").String()
+		keyCode := event.Get("keyCode").String()
+
+		if keyCode == "13" || key == "Enter" || key == "Return" {
+			event.Object.Call("preventDefault")
+			callback(event)
+		}
+	}
+}

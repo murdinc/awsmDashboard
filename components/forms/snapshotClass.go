@@ -149,7 +149,9 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
+
+	NumberField("Version", "version", state.Int("version"), s.storeValue).Modify(classEditForm)
 
 	TextField("Description", "description", state.String("description"), s.storeValue).Modify(classEditForm)
 

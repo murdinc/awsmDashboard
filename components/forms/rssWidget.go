@@ -116,7 +116,7 @@ func (r RSSWidgetForm) BuildWidgetForm(widgetName string, optionsResp interface{
 		el.HorizontalRule(),
 	)
 
-	widgetEditForm := el.Form()
+	widgetEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	TextField("Title", "title", state.String("title"), r.storeValue).Modify(widgetEditForm)
 	TextField("RSS URL", "rssUrl", state.String("rssUrl"), r.storeValue).Modify(widgetEditForm)

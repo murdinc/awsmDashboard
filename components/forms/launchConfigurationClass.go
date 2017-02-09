@@ -111,7 +111,7 @@ func (l LaunchConfigurationClassForm) BuildClassForm(className string, optionsRe
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	var classOptions map[string][]string
 	jsonParsed, _ := gabs.ParseJSON(optionsResp.([]byte))

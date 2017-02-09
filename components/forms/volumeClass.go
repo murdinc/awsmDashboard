@@ -121,7 +121,7 @@ func (v VolumeClassForm) BuildClassForm(className string, optionsResp interface{
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	TextField("Device Name", "deviceName", state.String("deviceName"), v.storeValue).Modify(classEditForm)
 	NumberField("Volume Size", "volumeSize", state.Int("volumeSize"), v.storeValue).Modify(classEditForm)

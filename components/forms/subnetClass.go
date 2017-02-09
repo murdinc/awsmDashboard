@@ -116,7 +116,7 @@ func (s SubnetClassForm) BuildClassForm(className string, optionsResp interface{
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	TextField("CIDR", "cidr", state.String("cidr"), s.storeValue).Modify(classEditForm)
 

@@ -146,7 +146,7 @@ func (i ImageClassForm) BuildClassForm(className string, optionsResp interface{}
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	NumberField("Version", "version", state.Int("version"), i.storeValue).Modify(classEditForm)
 	CreateableSelectMeta("Instance", "instance", instances, instancesMeta, state.Interface("instance"), i.storeSelect).Modify(classEditForm)

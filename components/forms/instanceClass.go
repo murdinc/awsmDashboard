@@ -157,7 +157,7 @@ func (i InstanceClassForm) BuildClassForm(className string, optionsResp interfac
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	SelectOne("Instance Type", "instanceType", instanceTypes, state.Interface("instanceType"), i.storeSelect).Modify(classEditForm)
 	SelectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], state.Interface("securityGroups"), i.storeSelect).Modify(classEditForm)

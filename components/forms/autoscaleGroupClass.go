@@ -125,7 +125,7 @@ func (a AutoscaleGroupClassForm) BuildClassForm(className string, optionsResp in
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	SelectOne("Launch Configuration Class", "launchConfigurationClass", classOptions["launchconfigurations"], state.Interface("launchConfigurationClass"), a.storeSelect).Modify(classEditForm)
 

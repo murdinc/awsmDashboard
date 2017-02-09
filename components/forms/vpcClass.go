@@ -120,7 +120,7 @@ func (v VpcClassForm) BuildClassForm(className string, optionsResp interface{}) 
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	TextField("CIDR", "cidr", state.String("cidr"), v.storeValue).Modify(classEditForm)
 	SelectOne("Tenancy", "tenancy", tenancy, state.Interface("tenancy"), v.storeSelect).Modify(classEditForm)

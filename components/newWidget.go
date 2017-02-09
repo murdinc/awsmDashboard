@@ -36,7 +36,7 @@ func (n NewWidget) Render() gr.Component {
 
 		// STEP 1
 
-		newWidgetForm := el.Form()
+		newWidgetForm := el.Form(evt.KeyDown(forms.CaptureEnter(n.stepOneNext)))
 
 		forms.TextField("Name", "widgetName", state.String("widgetName"), n.storeValue).Modify(newWidgetForm)
 		forms.SelectOne("Type", "widgetType", []string{"rss"}, state.Interface("widgetType"), n.storeSelect).Modify(newWidgetForm)

@@ -116,7 +116,7 @@ func (k KeyPairClassForm) BuildClassForm(className string, optionsResp interface
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	TextField("Description", "description", state.String("description"), k.storeValue).Modify(classEditForm)
 

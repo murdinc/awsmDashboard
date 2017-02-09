@@ -36,7 +36,7 @@ func (n NewClass) Render() gr.Component {
 
 		// STEP 1
 
-		newClassForm := el.Form()
+		newClassForm := el.Form(evt.KeyDown(forms.CaptureEnter(n.stepOneNext)))
 
 		forms.TextField("Name", "className", state.String("className"), n.storeValue).Modify(newClassForm)
 
@@ -96,9 +96,7 @@ func (n NewClass) closeButton(*gr.Event) {
 	hideAllModals()
 }
 
-func (n NewClass) stepOneNext(*gr.Event) {
-
-	n.SetState(gr.State{"querying": true, "error": ""})
+func (n NewClass) stepOneNext(e *gr.Event) {
 
 	go func(className string) {
 

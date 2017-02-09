@@ -204,7 +204,7 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 		el.HorizontalRule(),
 	)
 
-	classEditForm := el.Form()
+	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	TextField("Description", "description", state.String("description"), s.storeValue).Modify(classEditForm)
 
