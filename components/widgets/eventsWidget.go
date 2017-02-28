@@ -36,9 +36,11 @@ func (e EventsWidget) ComponentWillMount() {
 	go func() {
 		endpoint := "//localhost:8081/api/dashboard/widgets/events"
 		resp, err := helpers.GetAPI(endpoint)
+
 		if !e.IsMounted() {
 			return
 		}
+
 		if err != nil {
 			e.SetState(gr.State{"querying": false, "error": fmt.Sprintf("Error while querying endpoint: %s", endpoint)})
 			return
@@ -80,6 +82,7 @@ func (e EventsWidget) Render() gr.Component {
 	}
 
 	jsonParsed, _ := gabs.ParseJSON(eventsList)
+
 	eventsJson := jsonParsed.S("events").Bytes()
 	json.Unmarshal(eventsJson, &events)
 
@@ -111,8 +114,6 @@ Loop:
 		models.ExtractAwsmTable(i, event, &header, &rows)
 		if event.Archive {
 			count++
-		} else {
-			maxArchive--
 		}
 	}
 
@@ -124,10 +125,6 @@ Loop:
 		gr.CSS("table", "table-striped"),
 		gr.Style("width", "100%"),
 		el.TableHead(el.TableRow(helpers.BuildTableHeader(header)...)))
-
-	if count < 1 {
-		return response
-	}
 
 	tBody.Modify(table)
 
