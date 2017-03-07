@@ -243,29 +243,29 @@ func (a AutoscaleGroupClassForm) deleteButton(*gr.Event) {
 }
 
 func (a AutoscaleGroupClassForm) storeValue(event *gr.Event) {
-	id := event.Target().Get("id").String()
+	key := event.Target().Get("name").String()
 	inputType := event.Target().Get("type").String()
 
 	switch inputType {
 
 	case "checkbox":
-		a.SetState(gr.State{id: event.Target().Get("checked").Bool()})
+		a.SetState(gr.State{key: event.Target().Get("checked").Bool()})
 
 	case "number":
-		a.SetState(gr.State{id: event.TargetValue().Int()})
+		a.SetState(gr.State{key: event.TargetValue().Int()})
 
 	default: // text, at least
-		a.SetState(gr.State{id: event.TargetValue()})
+		a.SetState(gr.State{key: event.TargetValue()})
 
 	}
 }
 
-func (a AutoscaleGroupClassForm) storeSelect(id string, val interface{}) {
+func (a AutoscaleGroupClassForm) storeSelect(key string, val interface{}) {
 	switch value := val.(type) {
 
 	case map[string]interface{}:
 		// single
-		a.SetState(gr.State{id: value["value"]})
+		a.SetState(gr.State{key: value["value"]})
 
 	case []interface{}:
 		// multi
@@ -274,10 +274,10 @@ func (a AutoscaleGroupClassForm) storeSelect(id string, val interface{}) {
 		for i := 0; i < options; i++ {
 			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
 		}
-		a.SetState(gr.State{id: vals})
+		a.SetState(gr.State{key: vals})
 
 	default:
-		a.SetState(gr.State{id: val})
+		a.SetState(gr.State{key: val})
 
 	}
 }

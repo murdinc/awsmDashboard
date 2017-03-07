@@ -12,7 +12,7 @@ var (
 	reactCreatableSelect = gr.FromGlobal("Select", "Creatable")
 )
 
-func TextField(name, id string, v interface{}, storeFunc func(*gr.Event)) *gr.Element {
+func TextField(name, key string, v interface{}, storeFunc func(*gr.Event)) *gr.Element {
 
 	var value string
 
@@ -29,7 +29,7 @@ func TextField(name, id string, v interface{}, storeFunc func(*gr.Event)) *gr.El
 		el.Input(
 			attr.Type("text"),
 			attr.ClassName("form-control"),
-			attr.ID(id),
+			attr.Name(key),
 			attr.Placeholder(name),
 			attr.Value(value),
 			evt.Change(storeFunc),
@@ -37,7 +37,7 @@ func TextField(name, id string, v interface{}, storeFunc func(*gr.Event)) *gr.El
 	)
 }
 
-func NumberField(name, id string, value interface{}, storeFunc func(*gr.Event)) *gr.Element {
+func NumberField(name, key string, value interface{}, storeFunc func(*gr.Event)) *gr.Element {
 
 	return el.Div(
 		gr.CSS("form-group"),
@@ -47,7 +47,7 @@ func NumberField(name, id string, value interface{}, storeFunc func(*gr.Event)) 
 		el.Input(
 			attr.Type("number"),
 			attr.ClassName("form-control"),
-			attr.ID(id),
+			attr.Name(key),
 			attr.Placeholder(name),
 			attr.Value(value),
 			evt.Change(storeFunc),
@@ -55,7 +55,7 @@ func NumberField(name, id string, value interface{}, storeFunc func(*gr.Event)) 
 	)
 }
 
-func TextArea(name, id string, value string, storeFunc func(*gr.Event)) *gr.Element {
+func TextArea(name, key string, value string, storeFunc func(*gr.Event)) *gr.Element {
 	return el.Div(
 		gr.CSS("form-group"),
 		el.Label(
@@ -63,7 +63,7 @@ func TextArea(name, id string, value string, storeFunc func(*gr.Event)) *gr.Elem
 		),
 		el.TextArea(
 			attr.ClassName("form-control"),
-			attr.ID(id),
+			attr.Name(key),
 			attr.Placeholder(name),
 			evt.Change(storeFunc),
 			attr.Value(value),
@@ -72,7 +72,7 @@ func TextArea(name, id string, value string, storeFunc func(*gr.Event)) *gr.Elem
 	)
 }
 
-func Checkbox(name, id string, value bool, storeFunc func(*gr.Event)) *gr.Element {
+func Checkbox(name, key string, value bool, storeFunc func(*gr.Event)) *gr.Element {
 
 	label := "disabled"
 	var checked gr.Modifier
@@ -92,7 +92,7 @@ func Checkbox(name, id string, value bool, storeFunc func(*gr.Event)) *gr.Elemen
 				el.Input(
 					attr.Value(""), // to stop the warning about a uncontrolled components
 					attr.Type("checkbox"),
-					attr.ID(id),
+					attr.Name(key),
 					checked,
 					evt.Change(storeFunc).StopPropagation(),
 				),
@@ -102,7 +102,44 @@ func Checkbox(name, id string, value bool, storeFunc func(*gr.Event)) *gr.Elemen
 	)
 }
 
-func SelectOne(name, id string, options []string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
+func Toggle(falseName, trueName, key string, value interface{}, storeFunc func(*gr.Event)) *gr.Element {
+
+	valBool, ok := value.(bool)
+	if !ok {
+		valBool = false
+	}
+
+	label := falseName
+	var checked gr.Modifier
+	if valBool {
+		label = trueName
+		checked = attr.Checked(true)
+	}
+
+	return el.Div(
+		gr.CSS("form-group"),
+		el.Div(
+			el.Label(
+				gr.Text(label),
+			),
+		),
+		el.Div(
+			gr.CSS("switch"),
+			el.Label(
+				el.Input(
+					attr.Value(""), // to stop the warning about a uncontrolled components
+					attr.Type("checkbox"),
+					attr.Name(key),
+					checked,
+					evt.Change(storeFunc).StopPropagation(),
+				),
+				el.Div(gr.CSS("slider")),
+			),
+		),
+	)
+}
+
+func SelectOne(name, key string, options []string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
 	opts := make([]interface{}, len(options))
 	for i, option := range options {
 		opts[i] = map[string]string{
@@ -112,12 +149,12 @@ func SelectOne(name, id string, options []string, value interface{}, storeSelect
 	}
 
 	onChange := func(vals interface{}) {
-		storeSelect(id, vals)
+		storeSelect(key, vals)
 	}
 
 	reactSelect := gr.FromGlobal("Select")
 	reactSelectElem := reactSelect.CreateElement(gr.Props{
-		"name":               name,
+		"name":               key,
 		"value":              value,
 		"options":            opts,
 		"onChange":           onChange,
@@ -134,7 +171,7 @@ func SelectOne(name, id string, options []string, value interface{}, storeSelect
 	)
 }
 
-func SelectOneMeta(name, id string, options []string, optionsMeta map[string]string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
+func SelectOneMeta(name, key string, options []string, optionsMeta map[string]string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
 	opts := make([]interface{}, len(options))
 	for i, option := range options {
 		opts[i] = map[string]string{
@@ -144,7 +181,7 @@ func SelectOneMeta(name, id string, options []string, optionsMeta map[string]str
 	}
 
 	onChange := func(vals interface{}) {
-		storeSelect(id, vals)
+		storeSelect(key, vals)
 	}
 
 	//reactSelect := gr.FromGlobal("Select")
@@ -166,7 +203,7 @@ func SelectOneMeta(name, id string, options []string, optionsMeta map[string]str
 	)
 }
 
-func CreateableSelectMeta(name, id string, options []string, optionsMeta map[string]string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
+func CreateableSelectMeta(name, key string, options []string, optionsMeta map[string]string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
 
 	selStr, ok := value.(string)
 	if !ok {
@@ -194,7 +231,7 @@ func CreateableSelectMeta(name, id string, options []string, optionsMeta map[str
 	}
 
 	onChange := func(vals interface{}) {
-		storeSelect(id, vals)
+		storeSelect(key, vals)
 	}
 
 	reactSelectElem := reactCreatableSelect.CreateElement(gr.Props{
@@ -215,7 +252,7 @@ func CreateableSelectMeta(name, id string, options []string, optionsMeta map[str
 	)
 }
 
-func SelectMultiple(name, id string, options []string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
+func SelectMultiple(name, key string, options []string, value interface{}, storeSelect func(string, interface{})) *gr.Element {
 	opts := make([]interface{}, len(options))
 	for i, option := range options {
 		opts[i] = map[string]string{
@@ -225,7 +262,7 @@ func SelectMultiple(name, id string, options []string, value interface{}, storeS
 	}
 
 	onChange := func(vals interface{}) {
-		storeSelect(id, vals)
+		storeSelect(key, vals)
 	}
 
 	reactSelectElem := reactSelect.CreateElement(gr.Props{
@@ -246,7 +283,7 @@ func SelectMultiple(name, id string, options []string, value interface{}, storeS
 	)
 }
 
-func CreateableSelectMultiple(name, id string, options []string, s interface{}, storeSelect func(string, interface{})) *gr.Element {
+func CreateableSelectMultiple(name, key string, options []string, s interface{}, storeSelect func(string, interface{})) *gr.Element {
 
 	var selected []interface{}
 	selectedSlice, ok := s.([]interface{})
@@ -275,7 +312,7 @@ func CreateableSelectMultiple(name, id string, options []string, s interface{}, 
 	}
 
 	onChange := func(vals interface{}) {
-		storeSelect(id, vals)
+		storeSelect(key, vals)
 	}
 
 	reactSelectElem := reactCreatableSelect.CreateElement(gr.Props{

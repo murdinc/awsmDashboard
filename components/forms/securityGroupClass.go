@@ -3,13 +3,14 @@ package forms
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/Jeffail/gabs"
+	"github.com/asaskevich/govalidator"
 	"github.com/bep/gr"
 	"github.com/bep/gr/attr"
 	"github.com/bep/gr/el"
 	"github.com/bep/gr/evt"
-	"github.com/murdinc/awsm/config"
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
@@ -58,16 +59,16 @@ func (s SecurityGroupClassForm) ComponentWillMount() {
 func (s SecurityGroupClassForm) addGrant(*gr.Event) {
 	grants, ok := s.State().Interface("securityGroupGrants").([]interface{})
 	if ok {
-		grants = append([]interface{}{
-			&config.SecurityGroupGrant{
-				Note:       "New Grant",
-				Type:       "ingress",
-				FromPort:   0,
-				ToPort:     0,
-				IPProtocol: "tcp",
-				CidrIP:     []string{},
-			},
-		}, grants...)
+
+		newGrant := make(map[string]interface{})
+		newGrant["note"] = "New Grant"
+		newGrant["type"] = "ingress"
+		newGrant["fromPort"] = -1
+		newGrant["toPort"] = -1
+		newGrant["ipProtocol"] = "tcp"
+
+		grants = append([]interface{}{newGrant}, grants...)
+
 		s.SetState(gr.State{"securityGroupGrants": grants})
 		return
 	}
@@ -138,16 +139,76 @@ func (s SecurityGroupClassForm) Render() gr.Component {
 	return response
 }
 
+const portrange = "0123456789-"
+
+func validPortRange(s string) bool {
+	dashCount := 0
+	for _, char := range s {
+		if string(char) == "-" {
+			dashCount++
+		}
+		if dashCount > 1 {
+			return false
+		}
+		if !strings.Contains(portrange, strings.ToLower(string(char))) {
+			return false
+		}
+	}
+	if govalidator.IsPort(s) || s == "-1" || s == "" {
+		return true
+	} else {
+		ports := strings.Split(s, "-")
+
+		if govalidator.IsPort(ports[0]) && govalidator.IsPort(ports[1]) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (s SecurityGroupClassForm) modifyGrant(index int, grant map[string]interface{}) func(*gr.Event) {
 	return func(event *gr.Event) {
-		key := event.Target().Get("id").String()
+		key := event.Target().Get("name").String()
 		valueType := event.Target().Get("type").String()
+
+		if key == "port" {
+
+			port := strings.TrimSpace(event.TargetValue().String())
+
+			// so sorry
+			if validPortRange(port) {
+				grant["validPort"] = true
+
+				ports := strings.Split(port, "-")
+
+				if len(ports) == 2 {
+					if strings.TrimSpace(ports[0]) == "" {
+						grant["fromPort"] = strings.TrimSpace(ports[1])
+						grant["toPort"] = strings.TrimSpace(ports[1])
+					} else {
+						grant["fromPort"] = strings.TrimSpace(ports[0])
+						grant["toPort"] = strings.TrimSpace(ports[1])
+					}
+				} else {
+					grant["fromPort"] = port
+					grant["toPort"] = port
+				}
+
+			} else {
+				grant["validPort"] = false
+				grant["fromPort"] = ""
+				grant["toPort"] = ""
+			}
+		}
 
 		switch valueType {
 		case "text":
 			grant[key] = event.TargetValue().String()
 		case "number":
 			grant[key] = event.TargetValue().Int()
+		case "checkbox":
+			grant[key] = event.Target().Get("checked").Bool()
 		default:
 			println("modifyGrant does not have a switch for type:")
 			println(valueType)
@@ -238,40 +299,82 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 
 				grant := g.(map[string]interface{})
 
+				// Build the port value
+				if _, ok := grant["port"].(string); !ok {
+					if grant["fromPort"] == nil {
+						grant["port"] = "-1"
+					} else if grant["fromPort"] == grant["toPort"] {
+						grant["port"] = fmt.Sprint(grant["fromPort"])
+					} else {
+						grant["port"] = fmt.Sprintf("%d-%d", grant["fromPort"], grant["toPort"])
+					}
+
+					if validPortRange(grant["port"].(string)) {
+						grant["validPort"] = true
+					} else {
+						grant["validPort"] = false
+					}
+
+					// store it
+					s.modifyGrant(index, grant)
+				}
+
 				// Form placeholder
 				grantForm := el.Div()
 
-				TextField("Note", "note", grant["note"], s.modifyGrant(index, grant)).Modify(grantForm)
+				validDiv := el.Div()
 
 				el.Div(
-					gr.CSS("row"), el.Div(gr.CSS("col-sm-3"),
+					gr.CSS("row"), el.Div(gr.CSS("col-sm-12"),
+						TextField("Note", "note", grant["note"], s.modifyGrant(index, grant)),
+					),
+				).Modify(grantForm)
+
+				el.Div(
+					gr.CSS("row"), el.Div(gr.CSS("col-sm-4"),
 						SelectOne("Type", "type", []string{"ingress", "egress"}, grant["type"], s.storeSelect(index, grant)),
 					),
-					el.Div(gr.CSS("col-sm-3"),
-						NumberField("From Port", "fromPort", grant["fromPort"], s.modifyGrant(index, grant)),
-					),
-					el.Div(gr.CSS("col-sm-3"),
-						NumberField("To Port", "toPort", grant["toPort"], s.modifyGrant(index, grant)),
-					),
-					el.Div(gr.CSS("col-sm-3"),
+					el.Div(gr.CSS("col-sm-4"),
 						SelectOne("IP Protocol", "ipProtocol", []string{"tcp", "udp", "icmp"}, grant["ipProtocol"], s.storeSelect(index, grant)),
 					),
-				).Modify(grantForm)
-
-				el.Div(
-					gr.CSS("row"),
-					el.Div(gr.CSS("col-sm-12"),
-						CreateableSelectMultiple("CIDR IP's", "cidrIP", []string{ /* TODO */ }, grant["cidrIP"], s.storeSelect(index, grant)),
+					el.Div(gr.CSS("col-sm-4"),
+						TextField("Port", "port", grant["port"], s.modifyGrant(index, grant)),
 					),
 				).Modify(grantForm)
 
 				el.Div(
-					gr.CSS("btn-toolbar"),
-					el.Button(
-						evt.Click(s.removeGrant).PreventDefault(),
-						gr.CSS("btn", "btn-danger", "btn-sm", "pull-right"),
-						gr.Text("Remove"),
-						attr.ID(index),
+					gr.CSS("row"), el.Div(gr.CSS("col-sm-6"),
+						CreateableSelectMultiple("Security Groups", "sourceSecurityGroupNames", classOptions["securitygroups"], grant["sourceSecurityGroupNames"], s.storeSelect(index, grant)),
+					),
+					el.Div(gr.CSS("col-sm-6"),
+						CreateableSelectMultiple("CIDR IPs", "cidrIPs", []string{ /* TODO */ }, grant["cidrIPs"], s.storeSelect(index, grant)),
+					),
+				).Modify(grantForm)
+
+				// Port number validation message
+				if validPort, ok := grant["validPort"].(bool); ok {
+					if !validPort {
+						el.Div(
+							gr.CSS("invalid-message"),
+							el.Italic(gr.CSS("fa", "fa-exclamation-circle")),
+							gr.Text(" - Invalid Port Specified!"),
+						).Modify(validDiv)
+					}
+				}
+
+				el.Div(
+					gr.CSS("row"), el.Div(gr.CSS("col-sm-8"),
+						validDiv,
+					),
+
+					el.Div(gr.CSS("col-sm-4"),
+						gr.CSS("btn-toolbar"),
+						el.Button(
+							evt.Click(s.removeGrant).PreventDefault(),
+							gr.CSS("btn", "btn-danger", "btn-sm", "pull-right"),
+							gr.Text("Remove"),
+							attr.ID(index),
+						),
 					),
 				).Modify(grantForm)
 
@@ -377,19 +480,19 @@ func (s SecurityGroupClassForm) deleteButton(*gr.Event) {
 }
 
 func (s SecurityGroupClassForm) storeValue(event *gr.Event) {
-	id := event.Target().Get("id").String()
+	key := event.Target().Get("name").String()
 	inputType := event.Target().Get("type").String()
 
 	switch inputType {
 
 	case "checkbox":
-		s.SetState(gr.State{id: event.Target().Get("checked").Bool()})
+		s.SetState(gr.State{key: event.Target().Get("checked").Bool()})
 
 	case "number":
-		s.SetState(gr.State{id: event.TargetValue().Int()})
+		s.SetState(gr.State{key: event.TargetValue().Int()})
 
 	default: // text, at least
-		s.SetState(gr.State{id: event.TargetValue()})
+		s.SetState(gr.State{key: event.TargetValue()})
 
 	}
 }

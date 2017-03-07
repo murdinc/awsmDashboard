@@ -88,8 +88,8 @@ func (n NewWidget) Render() gr.Component {
 }
 
 func (n NewWidget) storeValue(event *gr.Event) {
-	id := event.Target().Get("id").String()
-	n.SetState(gr.State{id: event.TargetValue()})
+	key := event.Target().Get("name").String()
+	n.SetState(gr.State{key: event.TargetValue()})
 }
 
 func (n NewWidget) storeSelect(id string, val interface{}) {

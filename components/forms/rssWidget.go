@@ -216,29 +216,29 @@ func (r RSSWidgetForm) deleteButton(*gr.Event) {
 }
 
 func (r RSSWidgetForm) storeValue(event *gr.Event) {
-	id := event.Target().Get("id").String()
+	key := event.Target().Get("name").String()
 	inputType := event.Target().Get("type").String()
 
 	switch inputType {
 
 	case "checkbox":
-		r.SetState(gr.State{id: event.Target().Get("checked").Bool()})
+		r.SetState(gr.State{key: event.Target().Get("checked").Bool()})
 
 	case "number":
-		r.SetState(gr.State{id: event.TargetValue().Int()})
+		r.SetState(gr.State{key: event.TargetValue().Int()})
 
 	default: // text, at least
-		r.SetState(gr.State{id: event.TargetValue()})
+		r.SetState(gr.State{key: event.TargetValue()})
 
 	}
 }
 
-func (r RSSWidgetForm) storeSelect(id string, val interface{}) {
+func (r RSSWidgetForm) storeSelect(key string, val interface{}) {
 	switch value := val.(type) {
 
 	case map[string]interface{}:
 		// single
-		r.SetState(gr.State{id: value["value"]})
+		r.SetState(gr.State{key: value["value"]})
 
 	case []interface{}:
 		// multi
@@ -247,10 +247,10 @@ func (r RSSWidgetForm) storeSelect(id string, val interface{}) {
 		for i := 0; i < options; i++ {
 			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
 		}
-		r.SetState(gr.State{id: vals})
+		r.SetState(gr.State{key: vals})
 
 	default:
-		r.SetState(gr.State{id: val})
+		r.SetState(gr.State{key: val})
 
 	}
 }

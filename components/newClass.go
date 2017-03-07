@@ -87,8 +87,8 @@ func (n NewClass) Render() gr.Component {
 }
 
 func (n NewClass) storeValue(event *gr.Event) {
-	id := event.Target().Get("id").String()
-	n.SetState(gr.State{id: event.TargetValue()})
+	key := event.Target().Get("name").String()
+	n.SetState(gr.State{key: event.TargetValue()})
 }
 
 func (n NewClass) closeButton(*gr.Event) {

@@ -217,29 +217,29 @@ func (v VpcClassForm) deleteButton(*gr.Event) {
 }
 
 func (v VpcClassForm) storeValue(event *gr.Event) {
-	id := event.Target().Get("id").String()
+	key := event.Target().Get("name").String()
 	inputType := event.Target().Get("type").String()
 
 	switch inputType {
 
 	case "checkbox":
-		v.SetState(gr.State{id: event.Target().Get("checked").Bool()})
+		v.SetState(gr.State{key: event.Target().Get("checked").Bool()})
 
 	case "number":
-		v.SetState(gr.State{id: event.TargetValue().Int()})
+		v.SetState(gr.State{key: event.TargetValue().Int()})
 
 	default: // text, at least
-		v.SetState(gr.State{id: event.TargetValue()})
+		v.SetState(gr.State{key: event.TargetValue()})
 
 	}
 }
 
-func (v VpcClassForm) storeSelect(id string, val interface{}) {
+func (v VpcClassForm) storeSelect(key string, val interface{}) {
 	switch value := val.(type) {
 
 	case map[string]interface{}:
 		// single
-		v.SetState(gr.State{id: value["value"]})
+		v.SetState(gr.State{key: value["value"]})
 
 	case []interface{}:
 		// multi
@@ -248,10 +248,10 @@ func (v VpcClassForm) storeSelect(id string, val interface{}) {
 		for i := 0; i < options; i++ {
 			vals = append(vals, value[i].(map[string]interface{})["value"].(string))
 		}
-		v.SetState(gr.State{id: vals})
+		v.SetState(gr.State{key: vals})
 
 	default:
-		v.SetState(gr.State{id: val})
+		v.SetState(gr.State{key: val})
 
 	}
 }

@@ -8,8 +8,8 @@ import (
 func ErrorElem(errStr string) *gr.Element {
 	if errStr != "" {
 		return el.Div(
-			gr.CSS("alert", "alert-danger", "fade", "in"),
-			el.Strong(gr.Text("Error! ")),
+			gr.CSS("alert", "alert-danger"),
+			//el.Strong(gr.Text("Error! ")),
 			gr.Text(errStr),
 		)
 	}
@@ -20,8 +20,8 @@ func ErrorElem(errStr string) *gr.Element {
 func SuccessElem(successStr string) *gr.Element {
 	if successStr != "" {
 		return el.Div(
-			gr.CSS("alert", "alert-success", "fade", "in"),
-			el.Strong(gr.Text("Success! ")),
+			gr.CSS("alert", "alert-success"),
+			//el.Strong(gr.Text("Success! ")),
 			gr.Text(successStr),
 		)
 	}

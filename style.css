@@ -238,3 +238,71 @@ dl {
     color: #2ba2de;
     background-color: rgb(234, 233, 255);
 }
+
+.alert-success {
+    background-color: rgb(234, 233, 255);
+    border: 1px solid rgba(0,126,255,.24);
+    color: #2ba2de;
+}
+
+.alert {
+    padding: 10px;
+}
+
+
+/*
+*/
+/* Toggle Switches */
+/*
+*/
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgb(141, 185, 228) 0%, rgb(232, 201, 249) 77%);
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background: linear-gradient(135deg, rgb(232, 201, 249) 0%, rgb(141, 185, 228) 77%);
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+.invalid-message {
+    color: #d9534f;
+    font-weight: bold;
+}
