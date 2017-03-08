@@ -154,7 +154,7 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 
 		el.Div(
 			gr.CSS("row"), el.Div(gr.CSS("col-sm-6"),
-				SelectOne("Protocol", "protocol", []string{"tcp", "udp", "icmp"}, listener["protocol"], l.storeListenerSelect(index, listener)),
+				SelectOne("Protocol", "protocol", []string{"HTTP", "HTTPS", "TCP", "SSL"}, listener["protocol"], l.storeListenerSelect(index, listener)),
 			),
 			el.Div(gr.CSS("col-sm-6"),
 				NumberField("Load Balancer Port", "loadBalancerPort", listener["loadBalancerPort"], l.modifyListener(index, listener)),
@@ -163,7 +163,7 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 
 		el.Div(
 			gr.CSS("row"), el.Div(gr.CSS("col-sm-6"),
-				SelectOne("Instance Protocol", "instanceProtocol", []string{"tcp", "udp", "icmp"}, listener["instanceProtocol"], l.storeListenerSelect(index, listener)),
+				SelectOne("Instance Protocol", "instanceProtocol", []string{"HTTP", "HTTPS", "TCP", "SSL"}, listener["instanceProtocol"], l.storeListenerSelect(index, listener)),
 			),
 			el.Div(gr.CSS("col-sm-6"),
 				NumberField("Instance Port", "instancePort", listener["instancePort"], l.modifyListener(index, listener)),
