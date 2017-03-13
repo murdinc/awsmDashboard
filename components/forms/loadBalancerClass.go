@@ -23,7 +23,7 @@ type LoadBalancerClassForm struct {
 // Implements the StateInitializer interface
 func (l LoadBalancerClassForm) GetInitialState() gr.State {
 	return gr.State{"querying": true, "error": "", "success": "", "step": 1,
-		"listeners": []interface{}{},
+		"loadBalancerListeners": []interface{}{},
 	}
 }
 
@@ -34,6 +34,18 @@ func (l LoadBalancerClassForm) ComponentWillMount() {
 	if l.Props().Interface("class") != nil {
 		classJson := l.Props().Interface("class").([]byte)
 		json.Unmarshal(classJson, &class)
+	}
+
+	// health check
+	healthCheck := class["loadBalancerHealthCheck"].(map[string]interface{})
+	for k, v := range healthCheck {
+		class[k] = v
+	}
+
+	// attributes
+	attributes := class["loadBalancerAttributes"].(map[string]interface{})
+	for k, v := range attributes {
+		class[k] = v
 	}
 
 	l.SetState(class)
@@ -124,9 +136,58 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	SelectOne("Scheme", "scheme", elbSchemes, state.Interface("scheme"), l.storeSelect).Modify(classEditForm)
-	SelectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], state.Interface("securityGroups"), l.storeSelect).Modify(classEditForm)
-	SelectMultiple("Subnets", "subnets", classOptions["subnets"], state.Interface("subnets"), l.storeSelect).Modify(classEditForm)
+	SelectOne("Vpc", "vpc", classOptions["vpcs"], state.Interface("vpc"), l.storeSelect).Modify(classEditForm)
+	if vpc, ok := state.Interface("vpc").(string); ok && len(vpc) > 0 {
+		SelectMultiple("Subnets", "subnets", classOptions["subnets"], state.Interface("subnets"), l.storeSelect).Modify(classEditForm)
+		SelectMultiple("Security Groups", "securityGroups", classOptions["securitygroups"], state.Interface("securityGroups"), l.storeSelect).Modify(classEditForm)
+	}
+
 	SelectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], state.Interface("availabilityZones"), l.storeSelect).Modify(classEditForm)
+	Checkbox("Cross Zone Load Balancing", "crossZoneLoadBalancingEnabled", state.Bool("crossZoneLoadBalancingEnabled"), l.storeValue).Modify(classEditForm)
+
+	NumberField("Idle Timeout", "idleTimeout", state.Int("idleTimeout"), l.storeValue).Modify(classEditForm)
+
+	el.Div(
+		el.Break(nil),
+		el.Header4(
+			gr.Text("Health Check"),
+		),
+		el.HorizontalRule(nil),
+	).Modify(classEditForm)
+
+	TextField("Target", "healthCheckTarget", state.String("healthCheckTarget"), l.storeValue).Modify(classEditForm)
+	NumberField("Timeout", "healthCheckTimeout", state.Int("healthCheckTimeout"), l.storeValue).Modify(classEditForm)
+	NumberField("Interval", "healthCheckInterval", state.Int("healthCheckInterval"), l.storeValue).Modify(classEditForm)
+	NumberField("Unhealthy Threshold", "healthCheckUnhealthyThreshold", state.Int("healthCheckUnhealthyThreshold"), l.storeValue).Modify(classEditForm)
+	NumberField("Healthy Threshold", "healthCheckHealthyThreshold", state.Int("healthCheckHealthyThreshold"), l.storeValue).Modify(classEditForm)
+
+	el.Div(
+		el.Break(nil),
+		el.Header4(
+			gr.Text("Connection Draining"),
+		),
+		el.HorizontalRule(nil),
+	).Modify(classEditForm)
+
+	Toggle("Disabled", "Enabled", "connectionDrainingEnabled", state.Bool("connectionDrainingEnabled"), l.storeValue).Modify(classEditForm)
+	if state.Bool("connectionDrainingEnabled") {
+		NumberField("Draining Timeout", "connectionDrainingTimeout", state.Int("connectionDrainingTimeout"), l.storeValue).Modify(classEditForm)
+	}
+
+	el.Div(
+		el.Break(nil),
+		el.Header4(
+			gr.Text("Access Log"),
+		),
+		el.HorizontalRule(nil),
+	).Modify(classEditForm)
+
+	Toggle("Disabled", "Enabled", "accessLogEnabled", state.Bool("accessLogEnabled"), l.storeValue).Modify(classEditForm)
+	if state.Bool("accessLogEnabled") {
+		NumberField("Emit Interval", "accessLogEmitInterval", state.Int("accessLogEmitInterval"), l.storeValue).Modify(classEditForm)
+		TextField("S3 Bucket Name", "accessLogS3BucketName", state.String("accessLogS3BucketName"), l.storeValue).Modify(classEditForm)
+		TextField("S3 Bucket Prefix", "accessLogS3BucketPrefix", state.String("accessLogS3BucketPrefix"), l.storeValue).Modify(classEditForm)
+	}
 
 	el.Div(
 		el.Break(nil),
@@ -141,7 +202,7 @@ func (l LoadBalancerClassForm) BuildClassForm(className string, optionsResp inte
 		el.HorizontalRule(nil),
 	).Modify(classEditForm)
 
-	listeners := state.Interface("listeners").([]interface{})
+	listeners := state.Interface("loadBalancerListeners").([]interface{})
 
 	for index, listInf := range listeners {
 
@@ -239,6 +300,25 @@ func (l LoadBalancerClassForm) saveButton(*gr.Event) {
 		cfg[key] = l.State().Interface(key)
 	}
 
+	loadBalancerHealthCheck := make(map[string]interface{})
+	loadBalancerHealthCheck["healthCheckTarget"] = cfg["healthCheckTarget"]
+	loadBalancerHealthCheck["healthCheckTimeout"] = cfg["healthCheckTimeout"]
+	loadBalancerHealthCheck["healthCheckInterval"] = cfg["healthCheckInterval"]
+	loadBalancerHealthCheck["healthCheckUnhealthyThreshold"] = cfg["healthCheckUnhealthyThreshold"]
+	loadBalancerHealthCheck["healthCheckHealthyThreshold"] = cfg["healthCheckHealthyThreshold"]
+	cfg["loadBalancerHealthCheck"] = loadBalancerHealthCheck
+
+	loadBalancerAttributes := make(map[string]interface{})
+	loadBalancerAttributes["connectionDrainingEnabled"] = cfg["connectionDrainingEnabled"]
+	loadBalancerAttributes["connectionDrainingTimeout"] = cfg["connectionDrainingTimeout"]
+	loadBalancerAttributes["idleTimeout"] = cfg["idleTimeout"]
+	loadBalancerAttributes["crossZoneLoadBalancingEnabled"] = cfg["crossZoneLoadBalancingEnabled"]
+	loadBalancerAttributes["accessLogEnabled"] = cfg["accessLogEnabled"]
+	loadBalancerAttributes["accessLogEmitInterval"] = cfg["accessLogEmitInterval"]
+	loadBalancerAttributes["accessLogS3BucketName"] = cfg["accessLogS3BucketName"]
+	loadBalancerAttributes["accessLogS3BucketPrefix"] = cfg["accessLogS3BucketPrefix"]
+	cfg["loadBalancerAttributes"] = loadBalancerAttributes
+
 	go func() {
 		endpoint := "//localhost:8081/api/classes/" + l.Props().String("apiType") + "/name/" + l.Props().String("className")
 
@@ -328,10 +408,10 @@ func (l LoadBalancerClassForm) modifyListener(index int, listener map[string]int
 		case "number":
 			listener[key] = event.TargetValue().Int()
 		}
-		listeners, ok := l.State().Interface("listeners").([]interface{})
+		listeners, ok := l.State().Interface("loadBalancerListeners").([]interface{})
 		if ok {
 			listeners[index] = listener
-			l.SetState(gr.State{"listeners": listeners})
+			l.SetState(gr.State{"loadBalancerListeners": listeners})
 			return
 		}
 		println("modifyListener failed?")
@@ -360,17 +440,17 @@ func (l LoadBalancerClassForm) storeListenerSelect(index int, listener map[strin
 			listener[key] = val
 		}
 
-		listeners, ok := l.State().Interface("listeners").([]interface{})
+		listeners, ok := l.State().Interface("loadBalancerListeners").([]interface{})
 		if ok {
 			listeners[index] = listener
-			l.SetState(gr.State{"listeners": listeners})
+			l.SetState(gr.State{"loadBalancerListeners": listeners})
 			return
 		}
 	}
 }
 
 func (l LoadBalancerClassForm) addListener(*gr.Event) {
-	listeners, ok := l.State().Interface("listeners").([]interface{})
+	listeners, ok := l.State().Interface("loadBalancerListeners").([]interface{})
 	if ok {
 
 		newListener := make(map[string]interface{})
@@ -381,7 +461,7 @@ func (l LoadBalancerClassForm) addListener(*gr.Event) {
 
 		listeners = append([]interface{}{newListener}, listeners...)
 
-		l.SetState(gr.State{"listeners": listeners})
+		l.SetState(gr.State{"loadBalancerListeners": listeners})
 		return
 	}
 	println("addListener failed?")
@@ -389,10 +469,10 @@ func (l LoadBalancerClassForm) addListener(*gr.Event) {
 
 func (l LoadBalancerClassForm) removeListener(event *gr.Event) {
 	index := event.Target().Get("id").Int()
-	listeners, ok := l.State().Interface("listeners").([]interface{})
+	listeners, ok := l.State().Interface("loadBalancerListeners").([]interface{})
 	if ok {
 		listeners = append(listeners[:index], listeners[index+1:]...)
-		l.SetState(gr.State{"listeners": listeners})
+		l.SetState(gr.State{"loadBalancerListeners": listeners})
 		return
 	}
 	println("removeListener failed?")
