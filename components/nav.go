@@ -29,7 +29,11 @@ func (c Nav) Render() gr.Component {
 	elem := el.Div(gr.CSS("nav-wrapper"),
 		el.ListItem(
 			gr.CSS("nav-brand"),
-			el.Italic(gr.CSS("fa", "fa-cogs")),
+			//el.Italic(gr.CSS("fa", "fa-cogs")),
+			el.Image(
+				gr.CSS("awsm_logo_nav"),
+				attr.Src("/awsm_logo_9.png"),
+			),
 			gr.Text(" "),
 			grouter.Link("/", c.Brand),
 			attr.Key("brand"),

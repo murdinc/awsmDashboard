@@ -108,6 +108,12 @@ var (
 			Type:       "SimpleDB Domain",
 			HasClasses: false,
 		},
+		"S3 Buckets": components.Page{
+			Route:      "/buckets",
+			ApiType:    "buckets",
+			Type:       "S3 Buckets",
+			HasClasses: false,
+		},
 	}
 
 	reactRouter = js.Global.Get("ReactRouter")

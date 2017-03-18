@@ -80,11 +80,11 @@ hr {
 }
 
 .nav-wrapper  > .nav-brand a {
-    color: #a9a9a9;
+    color: #fff;
 }
 
 .nav-wrapper  > .nav-brand a:hover {
-    color: #fff;
+    color: #a9a9a9;
     background: none;
     text-decoration: none;
 }
@@ -305,4 +305,10 @@ input:checked + .slider:before {
 .invalid-message {
     color: #d9534f;
     font-weight: bold;
+}
+
+.awsm_logo_nav {
+    width: 70px;
+    padding-left: 10px;
+    padding-bottom: 10px;
 }

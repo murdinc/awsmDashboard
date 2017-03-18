@@ -97,6 +97,14 @@ func AssetTableBuilder(al interface{}) *gr.Element {
 			models.ExtractAwsmTable(i, aType, &header, &rows)
 		}
 
+	case "buckets":
+		var aType models.Bucket
+		for i, a := range assets {
+			aJson := a.Bytes()
+			json.Unmarshal(aJson, &aType)
+			models.ExtractAwsmTable(i, aType, &header, &rows)
+		}
+
 	case "instances":
 		var aType models.Instance
 		for i, a := range assets {
