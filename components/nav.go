@@ -32,7 +32,7 @@ func (c Nav) Render() gr.Component {
 			//el.Italic(gr.CSS("fa", "fa-cogs")),
 			el.Image(
 				gr.CSS("awsm_logo_nav"),
-				attr.Src("/awsm_logo_9.png"),
+				attr.Src("/awsm_logo.png"),
 			),
 			gr.Text(" "),
 			grouter.Link("/", c.Brand),
