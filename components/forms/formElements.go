@@ -337,7 +337,7 @@ func DisableEnter(event *gr.Event) {
 	key := event.Get("key").String()
 	keyCode := event.Get("keyCode").String()
 
-	if keyCode == "13" || key == "Enter" || key == "Return" {
+	if (keyCode == "13" || key == "Enter" || key == "Return") && event.Target().Get("type").String() != "textarea" {
 		event.Object.Call("preventDefault")
 	}
 }
