@@ -133,6 +133,8 @@ func (v VolumeClassForm) BuildClassForm(className string, optionsResp interface{
 		NumberField("IOPS", "iops", state.Int("iops"), v.storeValue).Modify(classEditForm)
 	}
 	Checkbox("Encrypted", "encrypted", state.Bool("encrypted"), v.storeValue).Modify(classEditForm)
+	TextField("Attach Command", "attachCommand", state.String("attachCommand"), v.storeValue).Modify(classEditForm)
+	TextField("Detach Command", "detachCommand", state.String("detachCommand"), v.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 
