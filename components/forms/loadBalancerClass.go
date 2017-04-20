@@ -23,7 +23,10 @@ type LoadBalancerClassForm struct {
 // Implements the StateInitializer interface
 func (l LoadBalancerClassForm) GetInitialState() gr.State {
 	return gr.State{"querying": true, "error": "", "success": "", "step": 1,
-		"loadBalancerListeners": []interface{}{},
+		"loadBalancerListeners":         []interface{}{},
+		"crossZoneLoadBalancingEnabled": false,
+		"connectionDrainingEnabled":     false,
+		"accessLogEnabled":              false,
 	}
 }
 
@@ -37,15 +40,17 @@ func (l LoadBalancerClassForm) ComponentWillMount() {
 	}
 
 	// health check
-	healthCheck := class["loadBalancerHealthCheck"].(map[string]interface{})
-	for k, v := range healthCheck {
-		class[k] = v
+	if healthCheck, ok := class["loadBalancerHealthCheck"].(map[string]interface{}); ok {
+		for k, v := range healthCheck {
+			class[k] = v
+		}
 	}
 
 	// attributes
-	attributes := class["loadBalancerAttributes"].(map[string]interface{})
-	for k, v := range attributes {
-		class[k] = v
+	if attributes, ok := class["loadBalancerAttributes"].(map[string]interface{}); ok {
+		for k, v := range attributes {
+			class[k] = v
+		}
 	}
 
 	l.SetState(class)

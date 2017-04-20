@@ -152,9 +152,7 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	NumberField("Version", "version", state.Int("version"), s.storeValue).Modify(classEditForm)
-
 	TextField("Description", "description", state.String("description"), s.storeValue).Modify(classEditForm)
-
 	Checkbox("Rotate", "rotate", state.Bool("rotate"), s.storeValue).Modify(classEditForm)
 	if state.Bool("rotate") {
 		NumberField("Retain", "retain", state.Int("retain"), s.storeValue).Modify(classEditForm)
@@ -163,8 +161,9 @@ func (s SnapshotClassForm) BuildClassForm(className string, optionsResp interfac
 	if state.Bool("propagate") {
 		SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), s.storeSelect).Modify(classEditForm)
 	}
-
 	SelectOneMeta("Volume", "volume", volumes, volumesMeta, state.Interface("volume"), s.storeSelect).Modify(classEditForm)
+	TextField("Pre Snapshot Command", "preSnapshotCommand", state.String("preSnapshotCommand"), s.storeValue).Modify(classEditForm)
+	TextField("Post Snapshot Command", "postSnapshotCommand", state.String("postSnapshotCommand"), s.storeValue).Modify(classEditForm)
 
 	classEditForm.Modify(classEdit)
 
