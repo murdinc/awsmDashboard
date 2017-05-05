@@ -120,6 +120,47 @@ func (s SubnetClassForm) BuildClassForm(className string, optionsResp interface{
 
 	TextField("CIDR", "cidr", state.String("cidr"), s.storeValue).Modify(classEditForm)
 
+	el.Div(
+		el.Break(nil),
+		el.Header4(
+			gr.Text("Internet Gateway"),
+		),
+		el.HorizontalRule(nil),
+	).Modify(classEditForm)
+
+	el.Label(gr.Text("Create Internet Gateway?")).Modify(classEditForm)
+	Toggle("No", "Yes", "createInternetGateway", state.Bool("createInternetGateway"), s.storeValue).Modify(classEditForm)
+
+	if state.Bool("createInternetGateway") {
+		el.Label(gr.Text("Add Internet Gateway to Main Route Table?")).Modify(classEditForm)
+		Toggle("No", "Yes", "addInternetGatewayToMainRouteTable", state.Bool("addInternetGatewayToMainRouteTable"), s.storeValue).Modify(classEditForm)
+
+		el.Label(gr.Text("Add Internet Gateway to New Route Table?")).Modify(classEditForm)
+		Toggle("No", "Yes", "addInternetGatewayToNewRouteTable", state.Bool("addInternetGatewayToNewRouteTable"), s.storeValue).Modify(classEditForm)
+	}
+
+	el.Div(
+		el.Break(nil),
+		el.Header4(
+			gr.Text("NAT Gateway"),
+		),
+		el.HorizontalRule(nil),
+	).Modify(classEditForm)
+
+	el.Label(gr.Text("Create NAT Gateway?")).Modify(classEditForm)
+	Toggle("No", "Yes", "createNatGateway", state.Bool("createNatGateway"), s.storeValue).Modify(classEditForm)
+
+	if state.Bool("createNatGateway") {
+
+		el.Label(gr.Text("Add NAT Gateway to Main Route Table?")).Modify(classEditForm)
+		Toggle("No", "Yes", "addNatGatewayToMainRouteTable", state.Bool("addNatGatewayToMainRouteTable"), s.storeValue).Modify(classEditForm)
+
+		el.Label(gr.Text("Add NAT Gateway to New Route Table?")).Modify(classEditForm)
+		Toggle("No", "Yes", "addNatGatewayToNewRouteTable", state.Bool("addNatGatewayToNewRouteTable"), s.storeValue).Modify(classEditForm)
+
+	}
+	el.HorizontalRule(nil).Modify(classEditForm)
+
 	classEditForm.Modify(classEdit)
 
 	buttons := el.Div(
