@@ -3,6 +3,7 @@ package forms
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/Jeffail/gabs"
@@ -184,21 +185,21 @@ func (s SecurityGroupClassForm) modifyGrant(index int, grant map[string]interfac
 
 				if len(ports) == 2 {
 					if strings.TrimSpace(ports[0]) == "" {
-						grant["fromPort"] = strings.TrimSpace(ports[1])
-						grant["toPort"] = strings.TrimSpace(ports[1])
+						grant["fromPort"], _ = strconv.Atoi(strings.TrimSpace(ports[1]))
+						grant["toPort"], _ = strconv.Atoi(strings.TrimSpace(ports[1]))
 					} else {
-						grant["fromPort"] = strings.TrimSpace(ports[0])
-						grant["toPort"] = strings.TrimSpace(ports[1])
+						grant["fromPort"], _ = strconv.Atoi(strings.TrimSpace(ports[0]))
+						grant["toPort"], _ = strconv.Atoi(strings.TrimSpace(ports[1]))
 					}
 				} else {
-					grant["fromPort"] = port
-					grant["toPort"] = port
+					grant["fromPort"], _ = strconv.Atoi(port)
+					grant["toPort"], _ = strconv.Atoi(port)
 				}
 
 			} else {
 				grant["validPort"] = false
-				grant["fromPort"] = ""
-				grant["toPort"] = ""
+				grant["fromPort"] = 0
+				grant["toPort"] = 0
 			}
 		}
 
@@ -306,7 +307,7 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 					} else if grant["fromPort"] == grant["toPort"] {
 						grant["port"] = fmt.Sprint(grant["fromPort"])
 					} else {
-						grant["port"] = fmt.Sprintf("%d-%d", grant["fromPort"], grant["toPort"])
+						grant["port"] = fmt.Sprint(grant["fromPort"]) + "-" + fmt.Sprint(grant["toPort"])
 					}
 
 					if validPortRange(grant["port"].(string)) {
