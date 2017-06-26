@@ -22,7 +22,7 @@ func hideModal(id string) {
 }
 
 func (m Modal) onShow(event *gr.Event) {
-	println("onShow")
+	//println("onShow")
 }
 
 func (m Modal) Render() gr.Component {
