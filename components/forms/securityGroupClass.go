@@ -15,7 +15,9 @@ import (
 	"github.com/murdinc/awsmDashboard/helpers"
 )
 
-var ()
+var (
+	displayIpProtocols = []string{"tcp", "udp", "icmp", "all", "icmpv6"}
+)
 
 type SecurityGroupClassForm struct {
 	*gr.This
@@ -233,6 +235,15 @@ func (s SecurityGroupClassForm) storeSelect(index int, grant map[string]interfac
 		case map[string]interface{}:
 			// single
 			grant[id] = value["value"]
+			if id == "displayIpProtocol" {
+				if grant[id] == "all" {
+					grant["ipProtocol"] = "-1"
+				} else if grant[id] == "icmpv6" {
+					grant["ipProtocol"] = "58"
+				} else {
+					grant["ipProtocol"] = grant[id].(string)
+				}
+			}
 
 		case []interface{}:
 			// multi
@@ -320,6 +331,20 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 					s.modifyGrant(index, grant)
 				}
 
+				// Build the display ip protocol
+				if _, ok := grant["displayIpProtocol"].(string); !ok {
+					if grant["ipProtocol"] == "-1" {
+						grant["displayIpProtocol"] = "all"
+					} else if grant["ipProtocol"] == "58" {
+						grant["displayIpProtocol"] = "icmpv6"
+					} else {
+						grant["displayIpProtocol"] = grant["ipProtocol"]
+					}
+
+					// store it
+					s.modifyGrant(index, grant)
+				}
+
 				// Form placeholder
 				grantForm := el.Div()
 
@@ -336,7 +361,7 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 						SelectOne("Type", "type", []string{"ingress", "egress"}, grant["type"], s.storeSelect(index, grant)),
 					),
 					el.Div(gr.CSS("col-sm-4"),
-						SelectOne("IP Protocol", "ipProtocol", []string{"tcp", "udp", "icmp"}, grant["ipProtocol"], s.storeSelect(index, grant)),
+						SelectOne("IP Protocol", "displayIpProtocol", displayIpProtocols, grant["displayIpProtocol"], s.storeSelect(index, grant)),
 					),
 					el.Div(gr.CSS("col-sm-4"),
 						TextField("Port", "port", grant["port"], s.modifyGrant(index, grant)),

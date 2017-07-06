@@ -131,6 +131,8 @@ func (a AlarmClassForm) BuildClassForm(className string, optionsResp interface{}
 
 	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
+	// TODO scalingpolicies arent the only type of alarm action!
+
 	TextField("Alarm Description", "alarmDescription", state.String("alarmDescription"), a.storeValue).Modify(classEditForm)
 	SelectMultiple("Alarm Actions", "alarmActions", classOptions["scalingpolicies"], state.Interface("alarmActions"), a.storeSelect).Modify(classEditForm)
 	SelectMultiple("OK Actions", "okActions", classOptions["scalingpolicies"], state.Interface("okActions"), a.storeSelect).Modify(classEditForm)

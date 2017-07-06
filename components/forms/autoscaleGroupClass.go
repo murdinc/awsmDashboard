@@ -129,13 +129,10 @@ func (a AutoscaleGroupClassForm) BuildClassForm(className string, optionsResp in
 
 	SelectOne("Launch Configuration Class", "launchConfigurationClass", classOptions["launchconfigurations"], state.Interface("launchConfigurationClass"), a.storeSelect).Modify(classEditForm)
 
-	//Checkbox("Rotate", "rotate", state.Interface("rotate"), a.storeValue).Modify(classEditForm)
-	//if state.Bool("rotate") {
-	NumberField("Retain", "retain", state.Int("retain"), a.storeValue).Modify(classEditForm)
-	//}
+	// NEEDED?
 	Checkbox("Propagate", "propagate", state.Bool("propagate"), a.storeValue).Modify(classEditForm)
 	if state.Bool("propagate") {
-		//SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), a.storeValue).Modify(classEditForm)
+		SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), a.storeSelect).Modify(classEditForm)
 	}
 
 	SelectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], state.Interface("availabilityZones"), a.storeSelect).Modify(classEditForm)
@@ -147,7 +144,6 @@ func (a AutoscaleGroupClassForm) BuildClassForm(className string, optionsResp in
 	SelectOne("Health Check Type", "healthCheckType", healthCheckTypes, state.Interface("healthCheckType"), a.storeSelect).Modify(classEditForm)
 	NumberField("Health Check Grace Period", "healthCheckGracePeriod", state.Int("healthCheckGracePeriod"), a.storeValue).Modify(classEditForm)
 	SelectMultiple("Termination Policies", "terminationPolicies", terminationPolicies, state.Interface("terminationPolicies"), a.storeSelect).Modify(classEditForm)
-	SelectMultiple("Scaling Policies", "scalingPolicies", classOptions["scalingpolicies"], state.Interface("scalingPolicies"), a.storeSelect).Modify(classEditForm)
 	SelectMultiple("Load Balancer Names", "loadBalancerNames", classOptions["loadbalancers"], state.Interface("loadBalancerNames"), a.storeSelect).Modify(classEditForm)
 	SelectMultiple("Alarms", "alarms", classOptions["alarms"], state.Interface("alarms"), a.storeSelect).Modify(classEditForm)
 
