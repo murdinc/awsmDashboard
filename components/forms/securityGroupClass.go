@@ -66,8 +66,8 @@ func (s SecurityGroupClassForm) addGrant(*gr.Event) {
 		newGrant := make(map[string]interface{})
 		newGrant["note"] = "New Grant"
 		newGrant["type"] = "ingress"
-		newGrant["fromPort"] = -1
-		newGrant["toPort"] = -1
+		newGrant["fromPort"] = 0
+		newGrant["toPort"] = 0
 		newGrant["ipProtocol"] = "tcp"
 
 		grants = append([]interface{}{newGrant}, grants...)
@@ -145,6 +145,10 @@ func (s SecurityGroupClassForm) Render() gr.Component {
 const portrange = "0123456789-"
 
 func validPortRange(s string) bool {
+	if s == "all" {
+		return true
+	}
+
 	dashCount := 0
 	for _, char := range s {
 		if string(char) == "-" {
@@ -157,7 +161,7 @@ func validPortRange(s string) bool {
 			return false
 		}
 	}
-	if govalidator.IsPort(s) || s == "-1" || s == "" {
+	if govalidator.IsPort(s) || s == "0" || s == "" {
 		return true
 	} else {
 		ports := strings.Split(s, "-")
@@ -179,8 +183,11 @@ func (s SecurityGroupClassForm) modifyGrant(index int, grant map[string]interfac
 
 			port := strings.TrimSpace(event.TargetValue().String())
 
-			// so sorry
-			if validPortRange(port) {
+			if port == "all" {
+				grant["validPort"] = true
+				grant["fromPort"] = 0
+				grant["toPort"] = 0
+			} else if validPortRange(port) {
 				grant["validPort"] = true
 
 				ports := strings.Split(port, "-")
@@ -314,11 +321,15 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 				// Build the port value
 				if _, ok := grant["port"].(string); !ok {
 					if grant["fromPort"] == nil {
-						grant["port"] = "-1"
+						grant["port"] = "0"
 					} else if grant["fromPort"] == grant["toPort"] {
 						grant["port"] = fmt.Sprint(grant["fromPort"])
 					} else {
 						grant["port"] = fmt.Sprint(grant["fromPort"]) + "-" + fmt.Sprint(grant["toPort"])
+					}
+
+					if grant["port"] == "0" {
+						grant["port"] = "all"
 					}
 
 					if validPortRange(grant["port"].(string)) {

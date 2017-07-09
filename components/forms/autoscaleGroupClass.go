@@ -128,13 +128,6 @@ func (a AutoscaleGroupClassForm) BuildClassForm(className string, optionsResp in
 	classEditForm := el.Form(evt.KeyDown(DisableEnter))
 
 	SelectOne("Launch Configuration Class", "launchConfigurationClass", classOptions["launchconfigurations"], state.Interface("launchConfigurationClass"), a.storeSelect).Modify(classEditForm)
-
-	// NEEDED?
-	Checkbox("Propagate", "propagate", state.Bool("propagate"), a.storeValue).Modify(classEditForm)
-	if state.Bool("propagate") {
-		SelectMultiple("Propagate Regions", "propagateRegions", classOptions["regions"], state.Interface("propagateRegions"), a.storeSelect).Modify(classEditForm)
-	}
-
 	SelectMultiple("Availability Zones", "availabilityZones", classOptions["zones"], state.Interface("availabilityZones"), a.storeSelect).Modify(classEditForm)
 	NumberField("Desired Capacity", "desiredCapacity", state.Int("desiredCapacity"), a.storeValue).Modify(classEditForm)
 	NumberField("Min Size", "minSize", state.Int("minSize"), a.storeValue).Modify(classEditForm)
