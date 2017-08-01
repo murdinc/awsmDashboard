@@ -187,6 +187,13 @@ func (s SecurityGroupClassForm) modifyGrant(index int, grant map[string]interfac
 				grant["validPort"] = true
 				grant["fromPort"] = 0
 				grant["toPort"] = 0
+
+				// ICMP/ICMPv4 ALL is -1, not 0
+				if grant["ipProtocol"] == "icmp" || grant["ipProtocol"] == "58" {
+					grant["fromPort"] = -1
+					grant["toPort"] = -1
+				}
+
 			} else if validPortRange(port) {
 				grant["validPort"] = true
 
@@ -328,7 +335,8 @@ func (s SecurityGroupClassForm) BuildClassForm(className string, optionsResp int
 						grant["port"] = fmt.Sprint(grant["fromPort"]) + "-" + fmt.Sprint(grant["toPort"])
 					}
 
-					if grant["port"] == "0" {
+					// ICMP/ICMPv4 ALL is -1, not 0
+					if grant["port"] == "0" || (grant["port"] == "-1" && (grant["ipProtocol"] == "icmp" || grant["ipProtocol"] == "58")) {
 						grant["port"] = "all"
 					}
 
